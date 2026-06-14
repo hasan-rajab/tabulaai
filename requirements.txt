@@ -1,0 +1,14 @@
+streamlit
+pandas
+numpy
+scikit-learn
+xgboost
+lightgbm
+catboost
+tabpfn
+shap
+plotly
+joblib
+imbalanced-learn
+groq
+python-dotenv

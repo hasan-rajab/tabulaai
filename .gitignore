@@ -1,0 +1,6 @@
+venv/
+__pycache__/
+*.pyc
+.env
+models/pretrained/*.joblib
+.DS_Store
