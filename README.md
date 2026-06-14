@@ -31,7 +31,7 @@ Models are pretrained on the OpenML-CC18 benchmark suite using XGBoost, LightGBM
 
 The pretrained model files are hosted on Google Drive. Download and place them in `models/pretrained/` before running the app.
 
-[Download pretrained models from Google Drive](YOUR_GOOGLE_DRIVE_LINK_HERE)
+[Download pretrained models from Google Drive](https://drive.google.com/drive/folders/1XZhGlfmHa-EHr8UACkuks9-SMlQCFTkU?usp=sharing)
 
 Files required:
 - base_xgb_clf.joblib
