@@ -48,7 +48,7 @@ Files required:
 Clone the repository:
 
 ```bash
-git clone https://github.com/g245kczb4x-png/tabulaai.git
+git clone https://github.com/hasan-rajab/tabulaai.git
 cd tabulaai
 ```
 
