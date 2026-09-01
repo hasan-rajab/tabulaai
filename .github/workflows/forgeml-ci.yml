@@ -18,6 +18,8 @@ jobs:
     name: ForgeML lifecycle integrity
     runs-on: ubuntu-latest
     timeout-minutes: 15
+    env:
+      PYTHONPATH: ${{ github.workspace }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
