@@ -43,8 +43,9 @@ class RiskDecision(BaseModel):
     anomaly_score: float = Field(ge=0.0, le=1.0)
     model_version: int
     model_role: Literal["champion", "challenger"]
-    challenger_score: float | None = None
-    experiment_bucket: int | None = None
+    champion_score: float = Field(ge=0.0, le=1.0)
+    challenger_score: float | None = Field(default=None, ge=0.0, le=1.0)
+    experiment_bucket: int | None = Field(default=None, ge=0, le=99)
     reasons: list[str] = Field(default_factory=list)
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
