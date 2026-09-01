@@ -1,0 +1,55 @@
+name: ForgeML CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: forgeml-ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  lifecycle-integrity:
+    name: ForgeML lifecycle integrity
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
+          cache-dependency-path: requirements-forgeml.txt
+
+      - name: Install ForgeML dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements-forgeml.txt
+
+      - name: Compile ForgeML sources
+        run: python -m compileall -q forgeml tests
+
+      - name: Run lifecycle regression tests
+        run: pytest -q tests/test_forgeml_lifecycle.py
+
+      - name: Verify API import
+        run: python -c "from forgeml.api import create_app; assert create_app"
+
+  container-build:
+    name: ForgeML container build
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Build serving image
+        run: docker build -f Dockerfile.forgeml -t forgeml:ci .
