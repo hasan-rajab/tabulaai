@@ -6,4 +6,5 @@ __pycache__/
 models/pretrained/*.joblib
 .DS_Store
 .forgeml/
+.falcon_state/
 .pytest_cache/

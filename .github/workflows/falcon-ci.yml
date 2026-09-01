@@ -1,0 +1,63 @@
+name: Falcon CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: falcon-ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  decisioning-integrity:
+    name: Falcon decisioning integrity
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      PYTHONPATH: .
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
+          cache-dependency-path: requirements-falcon.txt
+
+      - name: Install Falcon dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements-falcon.txt
+
+      - name: Compile Falcon and ForgeML sources
+        run: python -m compileall -q falcon forgeml tests
+
+      - name: Run end-to-end Falcon regressions
+        run: pytest -q tests/test_falcon_decisioning.py
+
+      - name: Verify API and Kafka worker imports
+        run: python -c "from falcon.api import create_app; from falcon.streaming import KafkaDecisionWorker; assert create_app and KafkaDecisionWorker"
+
+      - name: Bootstrap clean demo state
+        run: python -m falcon.cli --state-dir /tmp/falcon-release bootstrap --rows 600
+
+  container-build:
+    name: Falcon container build
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Build Falcon serving image
+        run: docker build -f Dockerfile.falcon -t falcon:ci .
+
+      - name: Validate Kafka development stack
+        run: docker compose -f docker-compose.falcon.yml config --quiet

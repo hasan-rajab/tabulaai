@@ -1,0 +1,56 @@
+services:
+  kafka:
+    image: bitnami/kafka:3.9.0
+    environment:
+      KAFKA_ENABLE_KRAFT: "yes"
+      KAFKA_CFG_NODE_ID: "0"
+      KAFKA_CFG_PROCESS_ROLES: "controller,broker"
+      KAFKA_CFG_CONTROLLER_QUORUM_VOTERS: "0@kafka:9093"
+      KAFKA_CFG_LISTENERS: "PLAINTEXT://:9092,CONTROLLER://:9093"
+      KAFKA_CFG_ADVERTISED_LISTENERS: "PLAINTEXT://kafka:9092"
+      KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP: "CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT"
+      KAFKA_CFG_CONTROLLER_LISTENER_NAMES: "CONTROLLER"
+      ALLOW_PLAINTEXT_LISTENER: "yes"
+    healthcheck:
+      test: ["CMD-SHELL", "kafka-topics.sh --bootstrap-server localhost:9092 --list >/dev/null 2>&1"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile.falcon
+    environment:
+      FALCON_STATE_DIR: /data
+      FALCON_ADMIN_KEY: local-dev-key
+    command: >-
+      sh -c "python -m falcon.cli --state-dir /data bootstrap --rows 1600 &&
+      python -m falcon.cli --state-dir /data serve --host 0.0.0.0 --port 8080"
+    ports:
+      - "8080:8080"
+    volumes:
+      - falcon-state:/data
+    healthcheck:
+      test: ["CMD", "python", "-c", "import json,urllib.request; d=json.load(urllib.request.urlopen('http://127.0.0.1:8080/health')); assert d.get('ready')"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+
+  worker:
+    build:
+      context: .
+      dockerfile: Dockerfile.falcon
+    environment:
+      FALCON_STATE_DIR: /data
+    command: ["python", "-m", "falcon.cli", "--state-dir", "/data", "worker", "--bootstrap-servers", "kafka:9092"]
+    volumes:
+      - falcon-state:/data
+    depends_on:
+      kafka:
+        condition: service_healthy
+      api:
+        condition: service_healthy
+
+volumes:
+  falcon-state:
