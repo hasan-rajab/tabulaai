@@ -1,0 +1,24 @@
+FROM python:3.12-slim
+
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    FORGEML_HOME=/var/lib/forgeml
+
+WORKDIR /app
+
+RUN groupadd --system forgeml && useradd --system --gid forgeml --create-home forgeml
+
+COPY requirements-forgeml.txt ./
+RUN pip install --no-cache-dir -r requirements-forgeml.txt
+
+COPY forgeml ./forgeml
+
+RUN mkdir -p /var/lib/forgeml && chown -R forgeml:forgeml /var/lib/forgeml /app
+USER forgeml
+
+EXPOSE 8000
+
+HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
+  CMD python -c "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/health', timeout=3)"
+
+CMD ["uvicorn", "forgeml.api:app", "--host", "0.0.0.0", "--port", "8000"]

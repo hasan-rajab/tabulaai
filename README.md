@@ -1,137 +1,309 @@
-# TabulaAI
+# ForgeML
 
-A domain-agnostic conversational data science assistant. Upload any CSV, ask questions in plain English, and get ML-powered insights instantly — no data science experience required.
+**A compact MLOps platform for taking tabular ML from validated data to governed production deployment.**
 
-## Overview
+ForgeML evolved from the original **TabulaAI** AutoML project. The existing Streamlit application and benchmarking code remain in the repository, but the project now adds a production-style lifecycle control plane around model development:
 
-TabulaAI automates the full data science workflow on any tabular dataset. It handles preprocessing, trains and benchmarks multiple models, explains predictions, and answers natural language questions about your data — all from a single interface.
+```text
+Dataset
+  -> validation + fingerprint
+  -> tracked experiment
+  -> train + evaluate
+  -> versioned model registry
+  -> candidate / staging / production
+  -> stable or canary deployment
+  -> prediction API
+  -> feature drift monitoring
+  -> retraining policy
+  -> promotion or rollback
+```
 
-The system uses models pretrained on the OpenML-CC18 benchmark suite (67 classification datasets, 5 regression datasets) and fine-tunes them on your uploaded CSV at inference time.
+The goal is not to recreate a commercial MLOps suite. ForgeML is an interview-defensible implementation of the engineering contracts that production ML systems need: reproducibility, lineage, controlled promotion, deployment safety, monitoring and rollback.
 
-## Features
+## Why ForgeML exists
 
-**Benchmark**
-Automatically trains and compares XGBoost, LightGBM, CatBoost, TabPFN, and a Stacking ensemble. Displays a ranked leaderboard with accuracy, F1, R², RMSE, and MAE depending on task type. Flags suspicious scores caused by small datasets.
+A notebook that produces a good metric is not a production ML system. The hard problems begin after training:
 
-**Ask**
-Natural language interface powered by Groq (Llama 3.1 8B). Ask anything about your data — feature relationships, model behavior, data quality — and get plain English answers grounded in your actual results.
+- Was the dataset valid before the run started?
+- Which exact data produced model version 3?
+- Which metric justified promotion?
+- Which artifact is currently serving traffic?
+- Can a challenger receive only 10% of requests?
+- Can deployment be rolled back without retraining?
+- Has the input distribution moved away from training data?
+- When should retraining be triggered?
 
-**Insights**
-Auto-generated narrative summaries of your dataset and model results. Two tabs: Data Insights (EDA narrative) and Model Insights (result interpretation). Regenerate at any time.
+ForgeML makes those states explicit and testable.
 
-**What-If Analysis**
-Adjust input feature values with sliders and see live predictions update instantly. Uses the best-performing reliable model automatically.
+## Core capabilities
 
-**Explainability**
-SHAP-based feature importance for XGBoost, LightGBM, and CatBoost. Ranks features by influence on predictions and generates a plain English explanation of the top features via Groq.
+### 1. Training-data contract
 
-## Pretrained Models
+`forgeml.validation.DatasetValidator` runs before training and records:
 
-Models are pretrained on the OpenML-CC18 benchmark suite using XGBoost, LightGBM, CatBoost, and a Logistic Regression meta-learner for stacking. Pretraining covers 67 classification and 5 regression datasets across diverse domains.
+- dataset size and schema
+- target validity
+- classification/regression contract
+- missingness limits
+- duplicate-row warnings
+- unusable/constant feature warnings
+- a SHA-256 data fingerprint
 
-The pretrained model files are hosted on Google Drive. Download and place them in `models/pretrained/` before running the app.
+Invalid datasets fail before an experiment can be registered as successful.
 
-[Download pretrained models from Google Drive](https://drive.google.com/drive/folders/1XZhGlfmHa-EHr8UACkuks9-SMlQCFTkU?usp=sharing)
+### 2. Durable experiment tracking
 
-Files required:
-- base_xgb_clf.joblib
-- base_lgbm_clf.joblib
-- base_cat_clf.joblib
-- base_meta_learner.joblib
-- base_xgb_reg.joblib
-- base_lgbm_reg.joblib
-- base_cat_reg.joblib
-- base_iso_forest.joblib
+`forgeml.tracking.ExperimentTracker` stores every run in SQLite with:
 
-## Setup
+- run ID
+- model name
+- task
+- data fingerprint
+- training parameters
+- lifecycle status (`running`, `completed`, `failed`)
+- evaluation metric
+- artifact URI
+- timestamps and failure reason
 
-Clone the repository:
+This provides lightweight experiment lineage without requiring an external tracking server.
+
+### 3. Versioned model registry
+
+`forgeml.registry.ModelRegistry` stores immutable model artifacts under versioned directories and tracks explicit stages:
+
+- `candidate`
+- `staging`
+- `production`
+- `archived`
+
+Promotion to production archives the previous production registry stage. Artifacts are never selected merely because they are the newest file on disk.
+
+### 4. Transactional train -> evaluate -> register flow
+
+`forgeml.training.ForgeTrainer` performs the lifecycle as one operation:
+
+1. validate data
+2. fingerprint the dataset
+3. create an experiment run
+4. split train/test data
+5. construct preprocessing for numeric and categorical features
+6. train a classification or regression pipeline
+7. evaluate it
+8. capture the training feature distribution
+9. serialize the complete inference bundle
+10. register a new candidate version
+11. mark the experiment complete
+
+If training or registration fails, the experiment is marked failed and temporary artifacts are removed.
+
+Current compact reference estimators are:
+
+- classification: logistic regression with class balancing
+- regression: random forest regression
+
+The registry/lifecycle interfaces are intentionally model-agnostic, so the estimator can be swapped for XGBoost, LightGBM, CatBoost or another serving-compatible pipeline.
+
+### 5. Stable + canary deployment state
+
+`forgeml.deployment.DeploymentManager` stores deployment state durably in SQLite.
+
+Supported transitions:
+
+```text
+candidate -> staging -> production
+                    \-> canary challenger
+
+stable v1 + challenger v2 @ 10%
+             |
+             +-> promote -> stable v2
+             |
+             +-> discard / rollback
+
+stable v2 -> rollback -> stable v1
+```
+
+Canary routing is deterministic from `request_id`, so the same request key maps to the same version while a canary is active.
+
+### 6. Production-style prediction API
+
+`forgeml.api` exposes FastAPI endpoints for:
+
+- `GET /health`
+- `POST /predict/{model_name}`
+- `POST /monitor/{model_name}`
+- `POST /deploy/stable`
+- `POST /deploy/canary`
+- `POST /deploy/{model_name}/promote-canary`
+- `POST /deploy/{model_name}/rollback`
+- `GET /deploy/{model_name}`
+
+Prediction responses include the actual model version used for the request, making canary behavior observable to callers.
+
+### 7. Drift monitoring
+
+Every trained model bundle contains a reference profile generated from its training features.
+
+`forgeml.monitoring.compute_drift` compares current traffic with that reference using:
+
+- PSI-style distribution drift for numeric features
+- total-variation distance for categorical features
+- missing-feature detection
+- per-feature scores
+- overall and maximum drift scores
+
+Drift is reported; it does not silently replace a production model.
+
+### 8. Retraining policy
+
+`forgeml.retraining.RetrainingPolicy` can trigger retraining when either:
+
+- feature drift exceeds a configured threshold, or
+- observed performance drops beyond a configured tolerance.
+
+The policy returns explicit reasons rather than performing an opaque automatic promotion. A retrained model still enters the registry as a candidate and must pass deployment gates.
+
+### 9. Rollback
+
+Every stable replacement keeps the previous stable version. Rollback changes deployment state back to that version without requiring a new model build.
+
+This is deliberate: retraining is not a rollback strategy.
+
+## Quick start
+
+Create a ForgeML-only environment:
 
 ```bash
-git clone https://github.com/hasan-rajab/tabulaai.git
-cd tabulaai
+python3.12 -m venv .venv
+source .venv/bin/activate
+pip install -r requirements-forgeml.txt
 ```
 
-Create a virtual environment with Python 3.12:
+Train and register a model:
 
 ```bash
-python3.12 -m venv venv
-source venv/bin/activate
+python -m forgeml.cli train data.csv \
+  --target churn \
+  --model-name churn-model
 ```
 
-Install dependencies:
+Inspect the output to obtain the registered version, then deploy it:
 
 ```bash
-pip install -r requirements.txt
+python -m forgeml.cli deploy \
+  --model-name churn-model \
+  --version 1
 ```
 
-Download the pretrained models from the Google Drive link above and place them in `models/pretrained/`.
-
-Add your Groq API key. Get a free key at console.groq.com:
+Start the serving API:
 
 ```bash
-echo "GROQ_API_KEY=your_key_here" > .env
+python -m forgeml.cli serve
 ```
 
-Run the app:
+Start a challenger at 10% traffic:
 
 ```bash
-streamlit run app.py
+python -m forgeml.cli canary \
+  --model-name churn-model \
+  --version 2 \
+  --fraction 0.10
 ```
 
-## Project Structure
+Promote the challenger:
 
-```
-tabulaai/
-├── app.py                        # Streamlit entry point
-├── core/
-│   ├── loader.py                 # CSV ingestion, type detection, task suggestion
-│   ├── preprocessor.py           # Encoding, imputation, scaling
-│   └── eda.py                    # EDA statistics and correlation
-├── models/
-│   ├── finetuner.py              # Fine-tuning pipeline for all models
-│   └── pretrained/               # Pretrained .joblib files (download separately)
-├── intelligence/
-│   ├── groq_client.py            # Groq API wrapper
-│   ├── router.py                 # NL question to task routing
-│   ├── narrator.py               # EDA and result narration
-│   └── explainer.py              # SHAP value computation
-├── ui/
-│   └── tabs/
-│       ├── overview.py           # Data overview and EDA charts
-│       ├── benchmark.py          # Model leaderboard
-│       ├── ask.py                # Natural language Q&A
-│       ├── insights.py           # Auto-generated narratives
-│       ├── whatif.py             # Live prediction interface
-│       └── explain.py            # SHAP explainability
-├── requirements.txt
-└── .env                          # Groq API key (not committed)
+```bash
+python -m forgeml.cli promote-canary --model-name churn-model
 ```
 
-## Tech Stack
+Rollback:
 
-- ML models: XGBoost, LightGBM, CatBoost, TabPFN, scikit-learn
-- Explainability: SHAP
-- LLM: Groq API with Llama 3.1 8B
-- Frontend: Streamlit, Plotly
-- Pretraining data: OpenML-CC18 benchmark suite
-
-## Experimental Protocol
-
-Pretraining uses the OpenML-CC18 benchmark suite. Each dataset is capped at 2,000 rows and padded or truncated to 200 features for a unified input space. Class imbalance is addressed via SMOTE capped at 200,000 rows. Rare classes with fewer than 50 samples are removed before training.
-
-Classification models are evaluated on accuracy, weighted F1, and macro F1. Regression models are evaluated on R², RMSE, and MAE. The stacking ensemble uses a Logistic Regression meta-learner trained on the probability outputs of the three base classifiers.
-
-At inference time, models are fine-tuned on the user's uploaded CSV using the pretrained hyperparameters as initialization. Fine-tuning adds 100 additional estimators per model.
-
-## Notes
-
-- Minimum recommended dataset size: 200 rows for reliable model scores
-- Scores of 1.0 on small datasets indicate overfitting, not genuine performance
-- Negative R² in regression means the model performs worse than a mean predictor, typically caused by insufficient data
-- LightGBM consistently underperforms on small datasets relative to XGBoost and CatBoost
-- The Groq API free tier supports approximately 14,400 requests per day, sufficient for normal usage
+```bash
+python -m forgeml.cli rollback --model-name churn-model
 ```
 
+Inspect deployment, registry and experiment history:
 
+```bash
+python -m forgeml.cli status --model-name churn-model
+```
 
+## Container
+
+Build the dedicated serving image:
+
+```bash
+docker build -f Dockerfile.forgeml -t forgeml:local .
+```
+
+Run with persistent state mounted into `/var/lib/forgeml`:
+
+```bash
+docker run --rm -p 8000:8000 \
+  -v "$(pwd)/.forgeml:/var/lib/forgeml" \
+  forgeml:local
+```
+
+The container runs as a non-root user and exposes a health check.
+
+## CI release gates
+
+`.github/workflows/forgeml-ci.yml` verifies on pull requests to `main`:
+
+- Python 3.12 dependency installation
+- source compilation
+- end-to-end lifecycle regression tests
+- API import
+- production container build
+
+The lifecycle tests cover:
+
+- validated training -> tracked experiment -> registry candidate
+- artifact loading and inference
+- two-version canary traffic routing
+- canary promotion
+- rollback to the prior stable version
+- feature-drift detection
+- drift-triggered retraining policy
+- performance-drop retraining policy
+- invalid training-data rejection
+
+## Repository layout
+
+```text
+forgeml/
+├── validation.py        # data contracts + fingerprinting
+├── tracking.py          # SQLite experiment lineage
+├── registry.py          # versioned model artifacts + stages
+├── training.py          # validation -> train -> evaluate -> register
+├── deployment.py        # stable/canary state + routing + rollback
+├── monitoring.py        # numeric/categorical drift detection
+├── retraining.py        # retraining decision policy
+├── api.py               # prediction, monitoring and deployment API
+└── cli.py               # lifecycle command line interface
+
+tests/
+└── test_forgeml_lifecycle.py
+
+Dockerfile.forgeml
+requirements-forgeml.txt
+.github/workflows/forgeml-ci.yml
+
+# Original TabulaAI application remains available
+app.py
+core/
+models/
+intelligence/
+ui/
+```
+
+## Engineering boundaries
+
+ForgeML currently uses local SQLite and filesystem artifacts so the full lifecycle is runnable on a laptop and in CI. In a multi-node production deployment these interfaces would normally be backed by services such as PostgreSQL, object storage, a managed registry and a distributed telemetry store.
+
+The drift monitor detects distribution movement; it does not prove model-quality degradation. Production retraining should combine drift with delayed labels, business KPIs and human release criteria.
+
+Canary routing here controls model-version selection inside the application. At larger scale the same policy would normally integrate with an API gateway, service mesh or model-serving platform.
+
+## Original TabulaAI
+
+The repository began as a domain-agnostic conversational data-science assistant that benchmarks tabular models, provides explainability and offers a Streamlit interface. That code remains intact as a useful experimentation surface. ForgeML adds the missing operational layer around training and serving rather than discarding the original project.
