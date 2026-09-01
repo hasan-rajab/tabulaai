@@ -1,294 +1,186 @@
-# ForgeML
+# ForgeML + Falcon
 
-**A compact MLOps platform for taking tabular ML from validated data to governed production deployment.**
+**Two production-style AI engineering systems: governed MLOps lifecycle management and real-time streaming decisioning.**
 
-ForgeML evolved from the original **TabulaAI** AutoML project. The existing Streamlit application and benchmarking code remain in the repository, but the project now adds a production-style lifecycle control plane around model development:
+This repository contains two connected flagship projects built around one engineering question:
 
-```text
-Dataset
-  -> validation + fingerprint
-  -> tracked experiment
-  -> train + evaluate
-  -> versioned model registry
-  -> candidate / staging / production
-  -> stable or canary deployment
-  -> prediction API
-  -> feature drift monitoring
-  -> retraining policy
-  -> promotion or rollback
-```
+> **How do you take machine learning from offline experiments to controlled, observable production decisions?**
 
-The goal is not to recreate a commercial MLOps suite. ForgeML is an interview-defensible implementation of the engineering contracts that production ML systems need: reproducibility, lineage, controlled promotion, deployment safety, monitoring and rollback.
+- **ForgeML** manages the model lifecycle: validated data, experiment lineage, registry versions, deployment stages, canary releases, drift monitoring, retraining recommendations, and rollback.
+- **Falcon** is the production workload: a Kafka-driven transaction-risk decision system with point-in-time features, XGBoost + autoencoder scoring, champion/challenger experimentation, delayed-label monitoring, and governed model promotion.
 
-## Why ForgeML exists
+The original TabulaAI experimentation application remains in the repository as the project lineage that preceded ForgeML.
 
-A notebook that produces a good metric is not a production ML system. The hard problems begin after training:
+## Recruiter quick scan
 
-- Was the dataset valid before the run started?
-- Which exact data produced model version 3?
-- Which metric justified promotion?
-- Which artifact is currently serving traffic?
-- Can a challenger receive only 10% of requests?
-- Can deployment be rolled back without retraining?
-- Has the input distribution moved away from training data?
-- When should retraining be triggered?
+| Project | Problem solved | Core engineering evidence |
+| --- | --- | --- |
+| **ForgeML** | Govern ML from dataset to production release | data contracts, SHA-256 lineage, experiment tracking, model registry, FastAPI serving, drift, canary, rollback, CI |
+| **Falcon** | Make low-latency risk decisions on streaming transaction events | Kafka, point-in-time features, XGBoost + autoencoder, champion/challenger, delayed feedback, Prometheus, Docker |
 
-ForgeML makes those states explicit and testable.
+**Primary stack:** Python 3.12 · FastAPI · Kafka · XGBoost · scikit-learn · SQLite · Prometheus · Docker · GitHub Actions
 
-## Core capabilities
-
-### 1. Training-data contract
-
-`forgeml.validation.DatasetValidator` runs before training and records:
-
-- dataset size and schema
-- target validity
-- classification/regression contract
-- missingness limits
-- duplicate-row warnings
-- unusable/constant feature warnings
-- a SHA-256 data fingerprint
-
-Invalid datasets fail before an experiment can be registered as successful.
-
-### 2. Durable experiment tracking
-
-`forgeml.tracking.ExperimentTracker` stores every run in SQLite with:
-
-- run ID
-- model name
-- task
-- data fingerprint
-- training parameters
-- lifecycle status (`running`, `completed`, `failed`)
-- evaluation metric
-- artifact URI
-- timestamps and failure reason
-
-This provides lightweight experiment lineage without requiring an external tracking server.
-
-### 3. Versioned model registry
-
-`forgeml.registry.ModelRegistry` stores immutable model artifacts under versioned directories and tracks explicit stages:
-
-- `candidate`
-- `staging`
-- `production`
-- `archived`
-
-Promotion to production archives the previous production registry stage. Artifacts are never selected merely because they are the newest file on disk.
-
-### 4. Transactional train -> evaluate -> register flow
-
-`forgeml.training.ForgeTrainer` performs the lifecycle as one operation:
-
-1. validate data
-2. fingerprint the dataset
-3. create an experiment run
-4. split train/test data
-5. construct preprocessing for numeric and categorical features
-6. train a classification or regression pipeline
-7. evaluate it
-8. capture the training feature distribution
-9. serialize the complete inference bundle
-10. register a new candidate version
-11. mark the experiment complete
-
-If training or registration fails, the experiment is marked failed and temporary artifacts are removed.
-
-Current compact reference estimators are:
-
-- classification: logistic regression with class balancing
-- regression: random forest regression
-
-The registry/lifecycle interfaces are intentionally model-agnostic, so the estimator can be swapped for XGBoost, LightGBM, CatBoost or another serving-compatible pipeline.
-
-### 5. Stable + canary deployment state
-
-`forgeml.deployment.DeploymentManager` stores deployment state durably in SQLite.
-
-Supported transitions:
+## Architecture relationship
 
 ```text
-candidate -> staging -> production
-                    \-> canary challenger
+                 OFFLINE / RELEASE PLANE
 
-stable v1 + challenger v2 @ 10%
-             |
-             +-> promote -> stable v2
-             |
-             +-> discard / rollback
+training data
+    |
+    v
++---------------------------+
+| ForgeML                   |
+| validation + fingerprint  |
+| experiment tracking       |
+| model registry            |
+| candidate/staging/prod    |
+| canary + rollback         |
++-------------+-------------+
+              |
+              | governed model version
+              v
 
-stable v2 -> rollback -> stable v1
+                 ONLINE / DECISION PLANE
+
+Kafka transactions
+      |
+      v
++---------------------------+
+| Falcon                    |
+| point-in-time features    |
+| XGBoost + autoencoder     |
+| champion/challenger       |
+| decision policy           |
++-------------+-------------+
+              |
+              +--> approve
+              +--> step_up
+              +--> manual_review
+              |
+              v
+      decisions + feedback
+              |
+              +--> drift/performance monitoring
+              +--> candidate retraining in ForgeML
 ```
 
-Canary routing is deterministic from `request_id`, so the same request key maps to the same version while a canary is active.
+## ForgeML
 
-### 6. Production-style prediction API
+ForgeML is a compact MLOps control plane implementing:
 
-`forgeml.api` exposes FastAPI endpoints for:
+- fail-fast training-data validation
+- SHA-256 dataset fingerprinting
+- durable SQLite experiment tracking
+- immutable versioned model artifacts
+- `candidate -> staging -> production -> archived` lifecycle
+- FastAPI prediction serving
+- deterministic canary routing
+- explicit promotion and rollback
+- numeric and categorical drift detection
+- performance/drift-based retraining recommendations
+- non-root Docker serving
+- CI regression gates
 
-- `GET /health`
-- `POST /predict/{model_name}`
-- `POST /monitor/{model_name}`
-- `POST /deploy/stable`
-- `POST /deploy/canary`
-- `POST /deploy/{model_name}/promote-canary`
-- `POST /deploy/{model_name}/rollback`
-- `GET /deploy/{model_name}`
+Read the engineering case study: **[FORGEML.md](FORGEML.md)**
 
-Prediction responses include the actual model version used for the request, making canary behavior observable to callers.
+## Falcon
 
-### 7. Drift monitoring
+Falcon is a real-time transaction-risk decision system implementing:
 
-Every trained model bundle contains a reference profile generated from its training features.
+- Kafka input/output worker with manual offset commits
+- idempotent transaction replay
+- point-in-time velocity, novelty, amount-deviation and behavioral features
+- XGBoost supervised risk scoring
+- bottleneck autoencoder anomaly scoring
+- governed score fusion and `approve / step_up / manual_review` decisions
+- deterministic champion/challenger assignment
+- shadow and active experiment modes
+- delayed fraud-label feedback
+- Brier score / ROC-AUC comparison
+- PSI-style feature-drift monitoring
+- candidate retraining through ForgeML
+- explicit challenger promotion and rollback
+- FastAPI control plane, Prometheus metrics and browser dashboard
+- non-root Docker image + Kafka Compose stack
 
-`forgeml.monitoring.compute_drift` compares current traffic with that reference using:
+Read the engineering case study: **[FALCON.md](FALCON.md)**
 
-- PSI-style distribution drift for numeric features
-- total-variation distance for categorical features
-- missing-feature detection
-- per-feature scores
-- overall and maximum drift scores
+## Verification evidence
 
-Drift is reported; it does not silently replace a production model.
+The repository has separate GitHub Actions release gates for both systems.
 
-### 8. Retraining policy
+### ForgeML CI
 
-`forgeml.retraining.RetrainingPolicy` can trigger retraining when either:
+- source compilation
+- lifecycle regression tests
+- API import
+- non-root container build
 
-- feature drift exceeds a configured threshold, or
-- observed performance drops beyond a configured tolerance.
+### Falcon CI
 
-The policy returns explicit reasons rather than performing an opaque automatic promotion. A retrained model still enters the registry as a candidate and must pass deployment gates.
+- Falcon + ForgeML source compilation
+- **7/7 end-to-end Falcon decisioning regression tests**
+- API + Kafka worker imports
+- clean champion/challenger bootstrap
+- non-root Falcon container build
+- Kafka Compose validation
 
-### 9. Rollback
+The Falcon bootstrap uses synthetic training data and marks that provenance explicitly in registry metadata. Its metrics are demonstration/regression evidence, not claims of real financial-fraud accuracy.
 
-Every stable replacement keeps the previous stable version. Rollback changes deployment state back to that version without requiring a new model build.
+## Engineering principles demonstrated
 
-This is deliberate: retraining is not a rollback strategy.
+1. **No label leakage:** online features are computed before the current transaction is persisted.
+2. **Reproducible lineage:** datasets, runs and model artifacts have explicit identities.
+3. **Safe releases:** challengers can be shadowed or traffic-split before promotion.
+4. **Rollback is a deployment operation:** reverting does not require retraining.
+5. **Delayed outcomes matter:** production model quality is evaluated against later labels, not just training metrics.
+6. **Monitoring does not silently deploy:** drift/retraining creates evidence and candidates; promotion remains explicit.
+7. **Idempotency is part of ML serving:** event replay returns the persisted decision instead of creating conflicting outcomes.
 
-## Quick start
+## Quick starts
 
-Create a ForgeML-only environment:
+### ForgeML
 
 ```bash
 python3.12 -m venv .venv
 source .venv/bin/activate
 pip install -r requirements-forgeml.txt
-```
-
-Train and register a model:
-
-```bash
-python -m forgeml.cli train data.csv \
-  --target churn \
-  --model-name churn-model
-```
-
-Inspect the output to obtain the registered version, then deploy it:
-
-```bash
-python -m forgeml.cli deploy \
-  --model-name churn-model \
-  --version 1
-```
-
-Start the serving API:
-
-```bash
+python -m forgeml.cli train data.csv --target churn --model-name churn-model
 python -m forgeml.cli serve
 ```
 
-Start a challenger at 10% traffic:
+### Falcon
 
 ```bash
-python -m forgeml.cli canary \
-  --model-name churn-model \
-  --version 2 \
-  --fraction 0.10
+python3.12 -m venv .venv
+source .venv/bin/activate
+pip install -r requirements-falcon.txt
+python -m falcon.cli --state-dir .falcon bootstrap
+python -m falcon.cli --state-dir .falcon serve
 ```
 
-Promote the challenger:
+Kafka development stack:
 
 ```bash
-python -m forgeml.cli promote-canary --model-name churn-model
+docker compose -f docker-compose.falcon.yml up --build
 ```
 
-Rollback:
-
-```bash
-python -m forgeml.cli rollback --model-name churn-model
-```
-
-Inspect deployment, registry and experiment history:
-
-```bash
-python -m forgeml.cli status --model-name churn-model
-```
-
-## Container
-
-Build the dedicated serving image:
-
-```bash
-docker build -f Dockerfile.forgeml -t forgeml:local .
-```
-
-Run with persistent state mounted into `/var/lib/forgeml`:
-
-```bash
-docker run --rm -p 8000:8000 \
-  -v "$(pwd)/.forgeml:/var/lib/forgeml" \
-  forgeml:local
-```
-
-The container runs as a non-root user and exposes a health check.
-
-## CI release gates
-
-`.github/workflows/forgeml-ci.yml` verifies on pull requests to `main`:
-
-- Python 3.12 dependency installation
-- source compilation
-- end-to-end lifecycle regression tests
-- API import
-- production container build
-
-The lifecycle tests cover:
-
-- validated training -> tracked experiment -> registry candidate
-- artifact loading and inference
-- two-version canary traffic routing
-- canary promotion
-- rollback to the prior stable version
-- feature-drift detection
-- drift-triggered retraining policy
-- performance-drop retraining policy
-- invalid training-data rejection
-
-## Repository layout
+## Repository map
 
 ```text
-forgeml/
-├── validation.py        # data contracts + fingerprinting
-├── tracking.py          # SQLite experiment lineage
-├── registry.py          # versioned model artifacts + stages
-├── training.py          # validation -> train -> evaluate -> register
-├── deployment.py        # stable/canary state + routing + rollback
-├── monitoring.py        # numeric/categorical drift detection
-├── retraining.py        # retraining decision policy
-├── api.py               # prediction, monitoring and deployment API
-└── cli.py               # lifecycle command line interface
-
-tests/
-└── test_forgeml_lifecycle.py
-
+forgeml/                  # MLOps lifecycle platform
+falcon/                   # real-time decision engine
+FORGEML.md                # ForgeML engineering case study
+FALCON.md                  # Falcon engineering case study
 Dockerfile.forgeml
+Dockerfile.falcon
+docker-compose.falcon.yml
 requirements-forgeml.txt
-.github/workflows/forgeml-ci.yml
+requirements-falcon.txt
+tests/
+.github/workflows/
 
-# Original TabulaAI application remains available
+# Original TabulaAI experimentation layer
 app.py
 core/
 models/
@@ -296,14 +188,8 @@ intelligence/
 ui/
 ```
 
-## Engineering boundaries
+## Scope boundaries
 
-ForgeML currently uses local SQLite and filesystem artifacts so the full lifecycle is runnable on a laptop and in CI. In a multi-node production deployment these interfaces would normally be backed by services such as PostgreSQL, object storage, a managed registry and a distributed telemetry store.
+These are portfolio-grade production-style systems, not claims of commercial deployment. Local SQLite/filesystem backends are used deliberately so lifecycle behavior remains reproducible on a laptop and in CI. A distributed production implementation would typically replace them with managed databases, object storage, distributed feature infrastructure and managed model-serving components.
 
-The drift monitor detects distribution movement; it does not prove model-quality degradation. Production retraining should combine drift with delayed labels, business KPIs and human release criteria.
-
-Canary routing here controls model-version selection inside the application. At larger scale the same policy would normally integrate with an API gateway, service mesh or model-serving platform.
-
-## Original TabulaAI
-
-The repository began as a domain-agnostic conversational data-science assistant that benchmarks tabular models, provides explainability and offers a Streamlit interface. That code remains intact as a useful experimentation surface. ForgeML adds the missing operational layer around training and serving rather than discarding the original project.
+Falcon does **not** execute payment declines or move money. Its policy output is a decision recommendation surface intended to demonstrate real-time AI engineering and controlled model release patterns.
