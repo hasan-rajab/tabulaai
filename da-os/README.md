@@ -1,8 +1,30 @@
-# DA.OS V0.5 — Data Analyst Bootcamp OS
+# DA.OS V0.6 — Data Analyst Bootcamp OS
 
-DA.OS is a lightweight personal operating system for an intensive data-analytics bootcamp. It is designed to reduce project friction without turning the bootcamp into answer-copying: plan the work, inspect the data, understand the next step, debug failures systematically, and make instructor feedback compound across future projects.
+DA.OS is a local-first personal operating system for an intensive data-analytics bootcamp. Its goal is not to assume a specific General Assembly assignment in advance. The system should accept the work GA actually gives the learner, turn it into an explicit execution plan, and then route each step through the right learning, data, debugging and feedback tools.
 
-## V0.5 modules
+## V0.6 principle
+
+```text
+ANY ASSIGNMENT
+      ↓
+Universal Assignment Adapter
+      ↓
+Deliverables + constraints + rubric + work type
+      ↓
+Task graph with evidence + validation criteria
+      ↓
+NEXT
+      ↓
+Dataset Preflight / Learning Coach / Error Doctor
+      ↓
+Feedback Memory
+      ↓
+Final QA layers (roadmap)
+```
+
+The **Universal Assignment Adapter** is now the recommended entry point. The older keyword-based Deconstructor remains available as a quick fallback.
+
+## Modules
 
 ### 1. Project Workspace
 - Project name and deadline
@@ -11,102 +33,131 @@ DA.OS is a lightweight personal operating system for an intensive data-analytics
 - Local file metadata list
 - Browser-local persistence with `localStorage`
 - Export the project state as JSON
+- Direct entry into Universal Assignment Adapter or Dataset Preflight
 
-### 2. Assignment Deconstructor
-- Extracts explicit requirements from the assignment brief
-- Detects common data-analytics work from keywords
-- Builds a practical task checklist with a reason and action for each step
-- Includes final validation and submission checks
+### 2. V0.6 Universal Assignment Adapter
+The adapter is designed to make DA.OS assignment-agnostic.
 
-### 3. NEXT engine
+Input:
+- pasted assignment brief
+- pasted rubric / grading criteria
+- locally extracted PDF
+- locally extracted DOCX
+- TXT / Markdown
+- SQL / Python source files
+- Jupyter notebooks (`.ipynb`)
+- JSON
+- CSV text
+
+The adapter does **not** upload the source file. Supported file text is extracted in the browser. PDF extraction uses a pinned PDF.js CDN build; DOCX extraction uses a pinned Mammoth.js CDN build.
+
+It detects likely assignment types such as:
+- data cleaning
+- exploratory analysis / EDA
+- Excel analysis
+- SQL exercise
+- Python / pandas
+- statistics
+- dashboard work
+- Power BI
+- Tableau
+- presentation / deck
+- business case / recommendations
+- capstone / end-to-end project
+- generic analytics fallback
+
+It also:
+- detects required tools
+- extracts likely deliverables
+- extracts explicit limits and constraints
+- parses rubric lines and visible percentage/points weights
+- detects individual/team work signals
+- surfaces ambiguities that should be confirmed before starting
+- identifies the first decision that should be made
+- builds a task graph appropriate to the detected work
+
+Every generated task contains:
+- **title** — the action to complete
+- **why** — why it matters analytically
+- **action** — what to do
+- **category** — Scope / Data / Metric / SQL / Python / Statistics / Analysis / Visualisation / Synthesis / Delivery / QA
+- **evidence** — what artifact should prove the step was completed
+- **validation** — how the learner should verify the work is correct
+
+Examples of task-specific adaptation:
+- SQL assignments get table-grain, join-risk and incremental-query steps.
+- Statistics assignments get hypothesis, assumption and interpretation steps.
+- Dashboard assignments get audience/KPI design and source-number reconciliation.
+- Presentation assignments get story/slide-limit and number-consistency checks.
+- Mixed projects can receive several of these workflows together.
+
+#### Commit to DA.OS
+
+**Use this plan in DA.OS** writes the adapter result into the existing project state:
+- project name
+- brief + rubric
+- detected supported tools
+- requirements
+- task graph
+- adapter metadata
+- source-file metadata (not the source file contents)
+
+DA.OS then opens the **NEXT** view so all other modules continue from the same assignment plan.
+
+### 3. Quick Deconstructor
+The original deterministic keyword-driven deconstructor remains available for short/simple briefs.
+
+For unusual, multi-tool, rubric-heavy or mixed assignments, Universal Assignment Adapter should be preferred.
+
+### 4. NEXT engine
 - Finds the first unfinished project task
 - Shows exactly what to do next and why
 - Displays upcoming work and total progress
+- Works with both quick-deconstructor tasks and V0.6 adapter-generated task graphs
 - Surfaces relevant Feedback Memory rules before you continue
-- Links directly to Dataset Preflight, Learning Coach and Error Doctor
+- Links to Assignment Adapter, Dataset Preflight, Learning Coach and Error Doctor
 
-### 4. Learning Coach
-- Reads the current NEXT task automatically
-- Supports Excel, SQL, Python, Power BI and Tableau
-- Uses a four-stage hint ladder: reasoning → tool structure → validation → worked pattern
-- Keeps worked examples hidden until the final hint
-- Saves scratch work and understood/needs-review status locally
-
-### 5. Error Doctor
-- Guided debugging for Excel, SQL and Python
-- Reveals diagnostic tests one at a time instead of immediately revealing the fix
-- Covers common Excel errors, SQL fan-out/grain/syntax issues and Python/pandas runtime patterns
-- Stores solved vs needs-review debugging sessions locally
-
-### 6. Mistake + Instructor Feedback Memory
-- Captures corrections from an instructor, self-review, peer or reviewer
-- Stores the original correction separately from the permanent lesson
-- Scopes lessons by tool, category, severity and trigger words
-- Matches active rules against future assignment/NEXT context
-- Supports Blocker / Warning / Tip levels
-- Tracks acknowledgement, search, pause/reactivate and origin project/task
-
-### 7. V0.5 Dataset Preflight
-Dataset Preflight is the first module that reads the actual dataset rather than only project metadata.
-
+### 5. Dataset Preflight
 Supported input:
 - CSV
 - XLSX
 - XLS
 
-What it profiles:
-- row and column counts
+Profiles up to the first 100,000 rows for:
+- rows / columns
 - duplicate rows
-- missing values and missing percentages
-- inferred field types: number, text, date, boolean, mixed, empty
-- unique counts / cardinality
-- numeric min, max, mean, median, quartiles
+- missing values
+- inferred number/text/date/boolean/mixed types
+- cardinality
+- numeric min/max/mean/median/quartiles
 - IQR-based outlier counts
 - date ranges
-- most common values
-- likely identifier, measure, time-dimension, segment/dimension and target/outcome roles
+- common values
+- likely identifier / measure / time / dimension / target roles
 
-What it flags:
-- mixed-type columns
-- high or moderate missingness
-- duplicate rows
-- identifiers with missing values
-- suspicious numeric outlier concentrations
+It produces a data-health summary and ordered starting checklist. Raw dataset rows are not stored in localStorage.
 
-What it suggests:
-- likely target/outcome fields
-- useful segmentation/dimension fields
-- ordered first cleaning/validation actions
-- a manual validation step before visualization
-- preserving the raw source rather than editing it destructively
+### 6. Learning Coach
+- Reads the current NEXT task
+- Supports Excel, SQL, Python, Power BI and Tableau
+- Uses a hint ladder: reasoning → structure → validation → worked pattern
+- Keeps examples hidden until later hints
+- Saves scratch work and understood/needs-review status locally
 
-Dataset Preflight deliberately distinguishes **heuristic suggestions** from facts. A target suggestion is not treated as proof of what the assignment asks; the learner must confirm it against the brief.
+### 7. Error Doctor
+- Guided Excel / SQL / Python debugging
+- Starts from exact error or wrong-result symptoms
+- Reveals diagnostic tests before the fix
+- Covers common Excel errors, SQL fan-out/grain/syntax issues and pandas/Python runtime patterns
+- Stores solved vs needs-review sessions locally
 
-For browser responsiveness, DA.OS profiles up to the first 100,000 rows. It labels the result when profiling was truncated.
-
-## V0.5 flow
-
-```text
-Assignment brief
-      ↓
-Project plan / NEXT
-      ↓
-CSV or XLSX
-      ↓
-Dataset Preflight
-      ↓
-Types + missing + duplicates + ranges + outliers
-      ↓
-Likely target / dimensions
-      ↓
-Recommended first actions
-      ↓
-Learning Coach / analysis
-      ↓
-Error Doctor when something breaks
-      ↓
-Feedback Memory after review
-```
+### 8. Mistake + Instructor Feedback Memory
+- Saves corrections from instructor, self-review, peer or reviewer
+- Separates original correction from permanent lesson
+- Supports Blocker / Warning / Tip rules
+- Matches rules against future assignment/NEXT context
+- Surfaces relevant past feedback inside NEXT
+- Tracks acknowledgement and origin project/task
 
 ## Quick start
 
@@ -126,7 +177,8 @@ http://localhost:8000
 Main pages:
 
 ```text
-/index.html      Project Workspace + Deconstructor + NEXT
+/index.html      Workspace + quick Deconstructor + NEXT
+/adapter.html    Universal Assignment Adapter
 /preflight.html  Dataset Preflight
 /coach.html      Learning Coach
 /doctor.html     Error Doctor
@@ -137,16 +189,21 @@ Main pages:
 
 DA.OS remains local-first.
 
-- Project text and project metadata are stored in browser `localStorage`.
-- Learning, debugging and feedback-memory records are stored in browser `localStorage`.
-- Dataset Preflight reads the selected file in the browser.
-- The **raw dataset is not stored in localStorage and is not uploaded by DA.OS**.
-- Only the generated profile summary is persisted locally so the learner can reopen the results without retaining raw rows.
+- Project/assignment text is stored in browser `localStorage` only when the learner saves/commits it to the DA.OS project.
+- Assignment files loaded into Adapter are read locally; source bytes are not uploaded by DA.OS.
+- Adapter source-file metadata may be saved with the project, not source contents.
+- Dataset Preflight reads selected data locally and does not persist raw rows.
+- Learning, debugging and feedback-memory records remain local to the browser.
 
-For Excel files, V0.5 loads SheetJS from a pinned public CDN build. Workbook bytes are still parsed locally in the browser. CSV parsing does not require the external library.
+External browser libraries currently used:
+- SheetJS for XLS/XLSX parsing in Dataset Preflight
+- PDF.js for PDF assignment-text extraction
+- Mammoth.js for DOCX assignment-text extraction
+
+Those libraries are loaded from pinned public CDN URLs; file parsing itself occurs client-side.
 
 Storage keys:
-- `daos-v0.1-state` — project state, retained for backward compatibility
+- `daos-v0.1-state` — shared project state, retained for backward compatibility and extended by V0.6 adapter metadata
 - `daos-v0.2-coach` — Learning Coach
 - `daos-v0.3-doctor` — Error Doctor
 - `daos-v0.4-feedback-memory` — personal feedback rules
@@ -154,29 +211,43 @@ Storage keys:
 
 ## Design principles
 
-1. **Plan before executing.**
-2. **Inspect before analysing.**
-3. **Reason before revealing.**
-4. **Verify rather than merely removing errors.**
-5. **Preserve learning and instructor feedback.**
-6. **No fake certainty.** Heuristics are labelled as heuristics.
-7. **Keep raw data local and transient.**
-8. **Make the learner more independent over time.**
+1. **Adapt before executing.** Do not assume the assignment type.
+2. **Plan from explicit deliverables and constraints.**
+3. **Inspect data before analysing.**
+4. **Reason before revealing answers.**
+5. **Keep evidence of completed analytical work.**
+6. **Validate outputs rather than merely making code/formulas run.**
+7. **Preserve instructor feedback so mistakes do not repeat.**
+8. **No fake certainty.** Classification and target suggestions are labelled as heuristic.
+9. **Keep raw files/data local and transient where possible.**
+10. **Make the learner more independent over time.**
 
-## Roadmap
+## Roadmap after V0.6
 
-- V0.6: Portfolio Mode for completed bootcamp projects
-- Later: optional LLM-backed assignment parsing/coaching/debugging/feedback extraction
-- Later: deeper statistical preflight, relationship checks and project-level evidence validation based on actual GA coursework
+### V0.7 — Rubric + Evidence Engine
+The adapter already **plans** evidence. V0.7 will track actual artifacts against requirements/rubric criteria and show which completed tasks still lack proof.
+
+### V0.8 — Submission Gate
+Cross-check requirements, data, calculations, visuals, narrative, recommendations and rubric coverage before submission using PASS / WARN / BLOCK states.
+
+### V0.9 — Unified “I’m stuck” Router
+One intake that routes the learner to Assignment Adapter, Dataset Preflight, Learning Coach, Error Doctor, Feedback Memory or Submission Gate based on the problem described.
+
+### V1.0 — Optional AI reasoning layer
+Use AI for ambiguous/unusual briefs and semantic interpretation while keeping deterministic state, validation, evidence and privacy-oriented fallbacks.
+
+Portfolio mode remains later in the roadmap, after the learner has completed real GA work worth converting into portfolio evidence.
 
 ## Current limitations
 
-- Assignment Deconstructor is deterministic and keyword-driven.
+- V0.6 assignment classification is transparent rule/pattern analysis rather than semantic AI reasoning.
+- It can misclassify vague or unusually worded briefs; the inferred type/ambiguities are shown so the learner can review them.
+- Rubric parsing recognizes visible text and simple percentage/point patterns but does not yet track live artifact coverage.
+- PDF extraction depends on PDFs containing selectable/extractable text; scanned-image PDFs need OCR or manual pasted text.
+- DOCX/PDF parsing requires the respective CDN script to load.
+- PPTX assignment-text extraction and screenshot OCR are not supported in V0.6; instructions can still be pasted manually.
 - Learning Coach uses a curated local lesson library.
 - Error Doctor cannot execute the learner's real Excel/SQL/Python runtime.
 - Feedback Memory uses transparent trigger matching rather than semantic embeddings.
-- Dataset Preflight does not infer business meaning and cannot determine whether a field is the *correct* target from data alone.
-- IQR outliers are prompts to inspect values, not automatic evidence that records are wrong.
-- XLS/XLSX parsing requires the SheetJS CDN script to load; CSV remains available without it.
 
-These limitations are intentional: DA.OS should be bootcamp-ready, understandable and useful before adding opaque automation.
+These limitations are explicit because DA.OS should be dependable and understandable before opaque automation is added.
