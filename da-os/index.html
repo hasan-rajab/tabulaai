@@ -17,6 +17,7 @@
       </div>
       <nav class="nav" aria-label="Primary navigation">
         <button class="nav-item active" data-view="workspace">Workspace</button>
+        <a class="nav-item" href="adapter.html" style="text-decoration:none;display:block;">Assignment Adapter</a>
         <button class="nav-item" data-view="deconstructor">Deconstructor</button>
         <button class="nav-item" data-view="next">NEXT</button>
         <a class="nav-item" href="preflight.html" style="text-decoration:none;display:block;">Dataset Preflight</a>
@@ -35,7 +36,8 @@
       <header class="topbar">
         <div><p class="eyebrow">PERSONAL DATA ANALYST OS</p><h1 id="projectHeading">Start your first project</h1></div>
         <div class="topbar-actions">
-          <a href="preflight.html" class="button button-primary" style="text-decoration:none;">Preflight dataset</a>
+          <a href="adapter.html" class="button button-primary" style="text-decoration:none;">Adapt any assignment</a>
+          <a href="preflight.html" class="button button-ghost" style="text-decoration:none;">Preflight dataset</a>
           <a href="memory.html" class="button button-ghost" style="text-decoration:none;">Feedback Memory</a>
           <a href="doctor.html" class="button button-ghost" style="text-decoration:none;">Error Doctor</a>
           <a href="coach.html" class="button button-ghost" style="text-decoration:none;">Learning Coach</a>
@@ -48,9 +50,10 @@
         <div class="hero-grid">
           <article class="card hero-card">
             <div>
-              <span class="pill">V0.5</span>
-              <h2>One place for every bootcamp project.</h2>
-              <p>Plan the work, inspect the dataset before analysis, learn the next step, diagnose errors, and make instructor feedback compound across future projects.</p>
+              <span class="pill">V0.6</span>
+              <h2>One system for whatever the bootcamp gives you.</h2>
+              <p>Adapt the assignment first, then inspect data, follow NEXT, learn the required method, debug failures, and reuse instructor feedback across future work.</p>
+              <div class="action-row" style="margin-top:16px;"><a href="adapter.html" class="button button-primary" style="text-decoration:none;background:#fff;color:#111318;">Start with the assignment →</a></div>
             </div>
             <div class="hero-stat"><span id="heroCompleted">0</span><small>tasks completed</small></div>
           </article>
@@ -65,7 +68,7 @@
           <article class="card">
             <div class="card-header"><div><p class="section-kicker">PROJECT WORKSPACE</p><h2>Project setup</h2></div><span id="saveStatus" class="save-status">Saved locally</span></div>
             <div class="form-grid">
-              <label>Project name<input id="projectName" type="text" placeholder="e.g. Kickstarter Campaign Analysis" /></label>
+              <label>Project name<input id="projectName" type="text" placeholder="e.g. Customer Churn Analysis" /></label>
               <label>Deadline<input id="deadline" type="date" /></label>
             </div>
             <fieldset>
@@ -78,8 +81,12 @@
                 <label class="check-chip"><input type="checkbox" value="Python" />Python</label>
               </div>
             </fieldset>
-            <label>Assignment brief<textarea id="assignmentBrief" rows="10" placeholder="Paste the full assignment instructions here..."></textarea></label>
-            <div class="action-row"><button id="deconstructBtn" class="button button-primary">Deconstruct assignment</button><button id="resetBtn" class="button button-danger-ghost">Reset project</button></div>
+            <label>Assignment brief<textarea id="assignmentBrief" rows="10" placeholder="Paste the full assignment instructions here, or use Universal Assignment Adapter for a stronger task-specific plan..."></textarea></label>
+            <div class="action-row">
+              <a href="adapter.html" class="button button-primary" style="text-decoration:none;">Use Universal Adapter</a>
+              <button id="deconstructBtn" class="button button-ghost">Quick deconstruct</button>
+              <button id="resetBtn" class="button button-danger-ghost">Reset project</button>
+            </div>
           </article>
 
           <article class="card">
@@ -87,16 +94,19 @@
             <label id="dropzone" class="dropzone">
               <input id="fileInput" type="file" multiple />
               <strong>Drop files here</strong><span>CSV, XLSX, PDF, PPTX, SQL, notebooks, screenshots</span>
-              <small>V0.5 stores file names and metadata locally; raw dataset profiling happens separately in Dataset Preflight and is not uploaded.</small>
+              <small>V0.6 stores file names and metadata here. Assignment Adapter can locally extract supported brief files; Dataset Preflight inspects CSV/XLSX data without uploading it.</small>
             </label>
             <div id="fileList" class="file-list empty-state">No files added yet.</div>
-            <div class="action-row" style="margin-top:14px;"><a href="preflight.html" class="button button-primary" style="text-decoration:none;">Inspect CSV/XLSX before analysis</a></div>
+            <div class="action-row" style="margin-top:14px;">
+              <a href="adapter.html" class="button button-ghost" style="text-decoration:none;">Interpret assignment file</a>
+              <a href="preflight.html" class="button button-primary" style="text-decoration:none;">Inspect CSV/XLSX before analysis</a>
+            </div>
           </article>
         </div>
       </section>
 
       <section id="deconstructor" class="view">
-        <div class="card page-intro"><div><p class="section-kicker">ASSIGNMENT DECONSTRUCTOR</p><h2>Turn the brief into a work plan.</h2><p>DA.OS extracts explicit requirements, detects likely analysis work, and turns the assignment into a checklist you can execute.</p></div><button id="rebuildBtn" class="button button-primary">Rebuild plan</button></div>
+        <div class="card page-intro"><div><p class="section-kicker">QUICK DECONSTRUCTOR</p><h2>Turn a pasted brief into a basic work plan.</h2><p>For mixed, unusual, rubric-driven or multi-tool assignments, use the Universal Assignment Adapter instead. The quick deconstructor remains as a lightweight fallback.</p></div><button id="rebuildBtn" class="button button-primary">Rebuild plan</button></div>
         <div class="content-grid deconstruct-grid">
           <article class="card"><div class="card-header"><div><p class="section-kicker">REQUIREMENTS</p><h2>What must be delivered</h2></div><span id="requirementCount" class="counter">0</span></div><div id="requirementsList" class="stack-list empty-state">Paste an assignment brief and run the deconstructor.</div></article>
           <article class="card"><div class="card-header"><div><p class="section-kicker">EXECUTION PLAN</p><h2>Your task checklist</h2></div><span id="taskCount" class="counter">0</span></div><div id="taskList" class="task-list empty-state">No tasks yet.</div></article>
@@ -112,6 +122,7 @@
               <div class="next-box"><span>DO THIS NOW</span><p id="nextAction">Go to Workspace and paste the assignment instructions.</p></div>
               <div class="next-meta"><div><span>Category</span><strong id="nextCategory">Setup</strong></div><div><span>Progress</span><strong id="nextProgress">0%</strong></div></div>
               <div class="action-row">
+                <a href="adapter.html" class="button button-ghost" style="text-decoration:none;">Re-check assignment</a>
                 <a href="preflight.html" class="button button-ghost" style="text-decoration:none;">Inspect dataset</a>
                 <a href="memory.html" class="button button-ghost" style="text-decoration:none;">Check past feedback</a>
                 <a href="coach.html" class="button button-ghost" style="text-decoration:none;">Coach me through this</a>
