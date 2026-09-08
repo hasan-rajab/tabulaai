@@ -1,8 +1,8 @@
-# DA.OS V0.2 — Data Analyst Bootcamp OS
+# DA.OS V0.3 — Data Analyst Bootcamp OS
 
-DA.OS is a lightweight personal operating system for an intensive data-analytics bootcamp. It keeps each project organised, turns an assignment brief into an executable checklist, always shows the next best action, and now coaches the learner through that action without immediately giving away the answer.
+DA.OS is a lightweight personal operating system for an intensive data-analytics bootcamp. It is designed to reduce project friction without turning the bootcamp into answer-copying: plan the work, understand the next step, debug failures systematically, and preserve what you learn.
 
-## V0.2 features
+## V0.3 modules
 
 ### 1. Project Workspace
 - Project name and deadline
@@ -27,48 +27,56 @@ DA.OS is a lightweight personal operating system for an intensive data-analytics
 
 ### 4. Learning Coach
 - Reads the current NEXT task automatically
-- Supports Excel, SQL, Python, Power BI and Tableau learning paths
-- Uses a four-level hint ladder:
-  1. reasoning prompt
-  2. tool structure
-  3. validation approach
-  4. worked pattern/example
-- Keeps examples hidden until the final hint
-- Provides task-aware teaching for:
-  - dataset inspection and cleaning
-  - success/outcome metrics
-  - duration analysis
-  - pledge-goal bands
-  - category comparisons
-  - launch timing
-  - SQL work
-  - Python work
-  - visualisation
-  - recommendations
-  - QA/submission checks
-- Includes a local scratchpad for formulas, SQL structure, reasoning and notes
-- Adds prompt chips for business question, numerator/denominator, data grain and validation
+- Supports Excel, SQL, Python, Power BI and Tableau
+- Uses a four-stage hint ladder: reasoning → tool structure → validation → worked pattern
+- Keeps the worked example hidden until the final hint
+- Includes task-aware lessons for common bootcamp analysis work
+- Saves a scratchpad for formulas, SQL structure, reasoning and notes
+- Uses self-check prompts for business question, grain, numerator/denominator and validation
 - Requires a four-part self-check before a concept can be marked understood
-- Tracks `understood` and `needs review` learning states in the browser
+- Tracks understood vs needs-review items locally
 
-## How to use it
+### 5. Error Doctor
+- Guided debugging for Excel, SQL and Python
+- Starts from the exact error/symptom and smallest relevant code/formula/query
+- Classifies common failure modes using a deterministic local pattern library
+- Reveals diagnostic tests one at a time instead of immediately revealing the fix
+- Requires at least two diagnostic tests before the fix pattern unlocks
+- Teaches the concept behind the error, not just the patch
+- Includes a persistent debug-notes area and reflection step
+- Stores solved vs needs-review debugging sessions locally
+- Builds a lightweight personal debugging memory so repeated errors become recognizable patterns
 
-1. Open the DA.OS workspace.
-2. Create a project or load the Kickstarter sample.
-3. Paste the assignment brief and run **Deconstruct assignment**.
-4. Open **NEXT** to see the current action.
-5. Click **Coach me through this** or open **Learning Coach** from the sidebar.
-6. Choose the tool you are using.
-7. Attempt the reasoning before revealing hints.
-8. Use the scratchpad to work through the step.
-9. Complete the self-check and mark the concept as understood, or flag it for review.
-10. Return to the project and continue to the next task.
+#### Error Doctor coverage in V0.3
+
+**Excel**
+- `#VALUE!` / type mismatches
+- `#N/A` / lookup mismatches
+- `#REF!` / broken references
+- `#DIV/0!` / denominator problems
+- generic formula/result diagnosis
+
+**SQL**
+- wrong/inflated totals from join fan-out
+- missing/ambiguous columns
+- `GROUP BY` / aggregation-grain mismatch
+- syntax/parser errors
+- generic result/query diagnosis
+
+**Python / pandas**
+- `KeyError`
+- `TypeError`
+- `ValueError`
+- `NameError`
+- import/environment problems
+- generic traceback/state diagnosis
 
 ## Quick start
 
 No build step is required.
 
 ```bash
+cd da-os
 python3 -m http.server 8000
 ```
 
@@ -78,43 +86,46 @@ Then open:
 http://localhost:8000
 ```
 
-You can also open `index.html` directly in a modern browser, although running a local server is more reliable.
+Main pages:
+
+```text
+/index.html    Project Workspace + Deconstructor + NEXT
+/coach.html    Learning Coach
+/doctor.html   Error Doctor
+```
 
 ## Privacy
 
-V0.2 remains fully client-side. Project text, file metadata, coach scratchpads, hint progress and learning status are stored in the browser's local storage. File contents are **not** uploaded or persisted by the app.
+V0.3 is fully client-side. Project text, file metadata, coach records, and debugging records are stored in browser `localStorage`. File contents are **not** uploaded or persisted by DA.OS.
 
-## Design principle
+Storage keys are intentionally separated:
 
-DA.OS should make the learner more capable, not make the learner dependent on the tool.
+- `daos-v0.1-state` — project state (retained for backward compatibility)
+- `daos-v0.2-coach` — Learning Coach state
+- `daos-v0.3-doctor` — Error Doctor state
 
-The Learning Coach therefore follows this sequence:
+## Design principles
 
-```text
-Think → Hint → Structure → Validate → Example
-```
+DA.OS should make the learner more independent over time.
 
-It intentionally avoids opening with a finished formula, query or analysis.
-
-## Current architecture
-
-- `index.html` — Workspace, Assignment Deconstructor and NEXT UI
-- `app.js` — project state, deterministic brief parsing, task generation and NEXT logic
-- `styles.css` — main DA.OS design system
-- `coach.html` — Learning Coach UI
-- `coach.js` — task-aware lesson and hint engine
-- `coach.css` — coach-specific interface styles
-
-Project state continues to use the original `daos-v0.1-state` local-storage key so existing V0.1 projects remain compatible. Learning records are stored separately under `daos-v0.2-coach`.
+1. **Plan before executing.** Turn briefs into visible requirements and tasks.
+2. **Reason before revealing.** Hints and debugging tests come before worked examples/fixes.
+3. **Verify, don't just remove errors.** A query/formula that runs can still be analytically wrong.
+4. **Preserve learning.** Scratch work, review status and debugging reflections should become useful memory.
+5. **No fake certainty.** V0.3 uses deterministic pattern matching and labels generic diagnoses as pattern-based; it does not pretend to prove the cause from incomplete evidence.
 
 ## Roadmap
 
-- V0.3: Error Doctor with guided debugging for Excel, SQL and Python
 - V0.4: Mistake + instructor-feedback memory
 - V0.5: Dataset preflight and field profiling
 - V0.6: Portfolio mode for completed bootcamp projects
-- Later: optional LLM-backed coaching while preserving the deterministic, no-API fallback
+- Later: optional LLM-backed assignment parsing/coaching/debugging while preserving deterministic fallbacks and the learn-first workflow
 
-## Current limitation
+## Current limitations
 
-The V0.2 coach is deterministic rather than conversational AI. This is intentional for the first bootcamp-ready version: it works without an API key, preserves privacy, and gives predictable teaching behavior. The next logical intelligence upgrade is the Error Doctor, where the learner can paste a real error and receive guided diagnostic questions instead of a one-shot fix.
+- The Assignment Deconstructor is deterministic and keyword-driven.
+- Learning Coach lessons are a curated local library rather than generated dynamically.
+- Error Doctor diagnoses common patterns and cannot execute the user's actual Excel workbook, SQL database, or Python environment in V0.3.
+- Because DA.OS cannot inspect the runtime directly yet, Error Doctor provides tests for the learner to run and asks them to verify the result.
+
+These limitations are intentional for the first bootcamp-ready versions: the app works immediately, requires no API key, keeps data local, and can be improved based on real General Assembly coursework rather than hypothetical requirements.
