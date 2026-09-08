@@ -6,6 +6,7 @@
   <meta name="description" content="DA.OS — a personal operating system for data analytics bootcamp projects." />
   <title>DA.OS — Data Analyst Bootcamp OS</title>
   <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="memory-alert.css" />
 </head>
 <body>
   <div class="app-shell">
@@ -24,6 +25,7 @@
         <button class="nav-item" data-view="next">NEXT</button>
         <a class="nav-item" href="coach.html" style="text-decoration:none;display:block;">Learning Coach</a>
         <a class="nav-item" href="doctor.html" style="text-decoration:none;display:block;">Error Doctor</a>
+        <a class="nav-item" href="memory.html" style="text-decoration:none;display:block;">Feedback Memory</a>
       </nav>
 
       <div class="sidebar-footer">
@@ -42,8 +44,9 @@
           <h1 id="projectHeading">Start your first project</h1>
         </div>
         <div class="topbar-actions">
-          <a href="doctor.html" class="button button-ghost" style="text-decoration:none;">Open Error Doctor</a>
-          <a href="coach.html" class="button button-ghost" style="text-decoration:none;">Open Learning Coach</a>
+          <a href="memory.html" class="button button-ghost" style="text-decoration:none;">Feedback Memory</a>
+          <a href="doctor.html" class="button button-ghost" style="text-decoration:none;">Error Doctor</a>
+          <a href="coach.html" class="button button-ghost" style="text-decoration:none;">Learning Coach</a>
           <button id="sampleBtn" class="button button-ghost">Load Kickstarter sample</button>
           <button id="exportBtn" class="button button-ghost">Export project</button>
         </div>
@@ -53,9 +56,9 @@
         <div class="hero-grid">
           <article class="card hero-card">
             <div>
-              <span class="pill">V0.3</span>
+              <span class="pill">V0.4</span>
               <h2>One place for every bootcamp project.</h2>
-              <p>Plan the work, learn the next step, and diagnose Excel, SQL and Python errors without losing the reasoning behind the solution.</p>
+              <p>Plan the work, learn the next step, diagnose errors, and turn every instructor correction into a rule that protects future projects.</p>
             </div>
             <div class="hero-stat">
               <span id="heroCompleted">0</span>
@@ -125,7 +128,7 @@
               <input id="fileInput" type="file" multiple />
               <strong>Drop files here</strong>
               <span>CSV, XLSX, PDF, PPTX, SQL, notebooks, screenshots</span>
-              <small>V0.3 stores file names and metadata locally; it does not upload file contents.</small>
+              <small>V0.4 stores file names and metadata locally; it does not upload file contents.</small>
             </label>
             <div id="fileList" class="file-list empty-state">No files added yet.</div>
           </article>
@@ -187,6 +190,7 @@
               </div>
 
               <div class="action-row">
+                <a href="memory.html" class="button button-ghost" style="text-decoration:none;">Check past feedback</a>
                 <a href="coach.html" class="button button-ghost" style="text-decoration:none;">Coach me through this</a>
                 <a href="doctor.html" class="button button-ghost" style="text-decoration:none;">Something broke</a>
                 <button id="completeNextBtn" class="button button-primary" disabled>Mark done & show next</button>
@@ -207,5 +211,6 @@
 
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
   <script src="app.js"></script>
+  <script src="memory-alert.js"></script>
 </body>
 </html>
