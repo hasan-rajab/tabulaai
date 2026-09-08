@@ -1,8 +1,8 @@
-# DA.OS V0.4 — Data Analyst Bootcamp OS
+# DA.OS V0.5 — Data Analyst Bootcamp OS
 
-DA.OS is a lightweight personal operating system for an intensive data-analytics bootcamp. It is designed to reduce project friction without turning the bootcamp into answer-copying: plan the work, understand the next step, debug failures systematically, and make instructor feedback compound across future projects.
+DA.OS is a lightweight personal operating system for an intensive data-analytics bootcamp. It is designed to reduce project friction without turning the bootcamp into answer-copying: plan the work, inspect the data, understand the next step, debug failures systematically, and make instructor feedback compound across future projects.
 
-## V0.4 modules
+## V0.5 modules
 
 ### 1. Project Workspace
 - Project name and deadline
@@ -20,89 +20,93 @@ DA.OS is a lightweight personal operating system for an intensive data-analytics
 
 ### 3. NEXT engine
 - Finds the first unfinished project task
-- Shows exactly what to do next
-- Explains why the step matters
-- Lets the learner mark it complete and immediately move on
-- Displays the next five queued tasks and total progress
-- V0.4 also checks relevant Feedback Memory rules and surfaces them directly in NEXT before the task is completed
+- Shows exactly what to do next and why
+- Displays upcoming work and total progress
+- Surfaces relevant Feedback Memory rules before you continue
+- Links directly to Dataset Preflight, Learning Coach and Error Doctor
 
 ### 4. Learning Coach
 - Reads the current NEXT task automatically
 - Supports Excel, SQL, Python, Power BI and Tableau
 - Uses a four-stage hint ladder: reasoning → tool structure → validation → worked pattern
-- Keeps the worked example hidden until the final hint
-- Includes task-aware lessons for common bootcamp analysis work
-- Saves a scratchpad for formulas, SQL structure, reasoning and notes
-- Uses self-check prompts for business question, grain, numerator/denominator and validation
-- Requires a four-part self-check before a concept can be marked understood
-- Tracks understood vs needs-review items locally
+- Keeps worked examples hidden until the final hint
+- Saves scratch work and understood/needs-review status locally
 
 ### 5. Error Doctor
 - Guided debugging for Excel, SQL and Python
-- Starts from the exact error/symptom and smallest relevant code/formula/query
-- Classifies common failure modes using a deterministic local pattern library
 - Reveals diagnostic tests one at a time instead of immediately revealing the fix
-- Requires at least two diagnostic tests before the fix pattern unlocks
-- Teaches the concept behind the error, not just the patch
-- Includes a persistent debug-notes area and reflection step
+- Covers common Excel errors, SQL fan-out/grain/syntax issues and Python/pandas runtime patterns
 - Stores solved vs needs-review debugging sessions locally
-- Builds a lightweight personal debugging memory so repeated errors become recognizable patterns
 
-#### Error Doctor coverage
-
-**Excel**
-- `#VALUE!` / type mismatches
-- `#N/A` / lookup mismatches
-- `#REF!` / broken references
-- `#DIV/0!` / denominator problems
-- generic formula/result diagnosis
-
-**SQL**
-- wrong/inflated totals from join fan-out
-- missing/ambiguous columns
-- `GROUP BY` / aggregation-grain mismatch
-- syntax/parser errors
-- generic result/query diagnosis
-
-**Python / pandas**
-- `KeyError`
-- `TypeError`
-- `ValueError`
-- `NameError`
-- import/environment problems
-- generic traceback/state diagnosis
-
-### 6. V0.4 Mistake + Instructor Feedback Memory
-- Captures corrections from an instructor, self-review, peer, or reviewer
+### 6. Mistake + Instructor Feedback Memory
+- Captures corrections from an instructor, self-review, peer or reviewer
 - Stores the original correction separately from the permanent lesson
-- Scopes each lesson by tool, category, severity and trigger words
-- Can suggest trigger words from the correction, lesson and current NEXT task
-- Matches active personal rules against the current project brief and NEXT task
-- Surfaces relevant rules proactively inside the normal NEXT screen
-- Supports **Blocker**, **Warning** and **Tip** severity levels
-- Tracks when a learner explicitly acknowledges a recurring rule
-- Keeps the original project/task where a rule was learned
-- Allows rules to be paused/reactivated rather than deleted when a lesson is temporarily irrelevant
-- Includes search/filtering over accumulated analytics memory
-- Includes three built-in examples for recommendation quality, chart sorting and rate-denominator mistakes
+- Scopes lessons by tool, category, severity and trigger words
+- Matches active rules against future assignment/NEXT context
+- Supports Blocker / Warning / Tip levels
+- Tracks acknowledgement, search, pause/reactivate and origin project/task
 
-The key V0.4 loop is:
+### 7. V0.5 Dataset Preflight
+Dataset Preflight is the first module that reads the actual dataset rather than only project metadata.
+
+Supported input:
+- CSV
+- XLSX
+- XLS
+
+What it profiles:
+- row and column counts
+- duplicate rows
+- missing values and missing percentages
+- inferred field types: number, text, date, boolean, mixed, empty
+- unique counts / cardinality
+- numeric min, max, mean, median, quartiles
+- IQR-based outlier counts
+- date ranges
+- most common values
+- likely identifier, measure, time-dimension, segment/dimension and target/outcome roles
+
+What it flags:
+- mixed-type columns
+- high or moderate missingness
+- duplicate rows
+- identifiers with missing values
+- suspicious numeric outlier concentrations
+
+What it suggests:
+- likely target/outcome fields
+- useful segmentation/dimension fields
+- ordered first cleaning/validation actions
+- a manual validation step before visualization
+- preserving the raw source rather than editing it destructively
+
+Dataset Preflight deliberately distinguishes **heuristic suggestions** from facts. A target suggestion is not treated as proof of what the assignment asks; the learner must confirm it against the brief.
+
+For browser responsiveness, DA.OS profiles up to the first 100,000 rows. It labels the result when profiling was truncated.
+
+## V0.5 flow
 
 ```text
-Instructor/self correction
-        ↓
-Permanent lesson
-        ↓
-Trigger words + scope
-        ↓
-Future NEXT task
-        ↓
-Relevant rule appears
-        ↓
-Learner acknowledges the check
+Assignment brief
+      ↓
+Project plan / NEXT
+      ↓
+CSV or XLSX
+      ↓
+Dataset Preflight
+      ↓
+Types + missing + duplicates + ranges + outliers
+      ↓
+Likely target / dimensions
+      ↓
+Recommended first actions
+      ↓
+Learning Coach / analysis
+      ↓
+Error Doctor when something breaks
+      ↓
+Feedback Memory after review
 ```
-
-The goal is simple: **do not make the same category of analytical mistake twice.**
 
 ## Quick start
 
@@ -122,47 +126,57 @@ http://localhost:8000
 Main pages:
 
 ```text
-/index.html    Project Workspace + Deconstructor + NEXT
-/coach.html    Learning Coach
-/doctor.html   Error Doctor
-/memory.html   Mistake + Instructor Feedback Memory
+/index.html      Project Workspace + Deconstructor + NEXT
+/preflight.html  Dataset Preflight
+/coach.html      Learning Coach
+/doctor.html     Error Doctor
+/memory.html     Mistake + Instructor Feedback Memory
 ```
 
 ## Privacy
 
-V0.4 is fully client-side. Project text, file metadata, coach records, debugging records, and feedback-memory rules are stored in browser `localStorage`. File contents are **not** uploaded or persisted by DA.OS.
+DA.OS remains local-first.
 
-Storage keys are intentionally separated:
+- Project text and project metadata are stored in browser `localStorage`.
+- Learning, debugging and feedback-memory records are stored in browser `localStorage`.
+- Dataset Preflight reads the selected file in the browser.
+- The **raw dataset is not stored in localStorage and is not uploaded by DA.OS**.
+- Only the generated profile summary is persisted locally so the learner can reopen the results without retaining raw rows.
 
-- `daos-v0.1-state` — project state (retained for backward compatibility)
-- `daos-v0.2-coach` — Learning Coach state
-- `daos-v0.3-doctor` — Error Doctor state
-- `daos-v0.4-feedback-memory` — personal feedback rules and acknowledgement count
+For Excel files, V0.5 loads SheetJS from a pinned public CDN build. Workbook bytes are still parsed locally in the browser. CSV parsing does not require the external library.
+
+Storage keys:
+- `daos-v0.1-state` — project state, retained for backward compatibility
+- `daos-v0.2-coach` — Learning Coach
+- `daos-v0.3-doctor` — Error Doctor
+- `daos-v0.4-feedback-memory` — personal feedback rules
+- `daos-v0.5-preflight` — dataset profile summary only
 
 ## Design principles
 
-DA.OS should make the learner more independent over time.
-
-1. **Plan before executing.** Turn briefs into visible requirements and tasks.
-2. **Reason before revealing.** Hints and debugging tests come before worked examples/fixes.
-3. **Verify, don't just remove errors.** A query/formula that runs can still be analytically wrong.
-4. **Preserve learning.** Scratch work, debugging reflections and instructor corrections become useful memory.
-5. **Make feedback compound.** A correction should influence future work instead of disappearing after one assignment.
-6. **No fake certainty.** Rule matching is explainable trigger/scope matching; it does not pretend every reminder is universally applicable.
-7. **Keep the learner in control.** Feedback rules can be acknowledged, paused, reactivated or deleted.
+1. **Plan before executing.**
+2. **Inspect before analysing.**
+3. **Reason before revealing.**
+4. **Verify rather than merely removing errors.**
+5. **Preserve learning and instructor feedback.**
+6. **No fake certainty.** Heuristics are labelled as heuristics.
+7. **Keep raw data local and transient.**
+8. **Make the learner more independent over time.**
 
 ## Roadmap
 
-- V0.5: Dataset preflight and field profiling
-- V0.6: Portfolio mode for completed bootcamp projects
-- Later: optional LLM-backed assignment parsing/coaching/debugging/feedback extraction while preserving deterministic fallbacks and the learn-first workflow
+- V0.6: Portfolio Mode for completed bootcamp projects
+- Later: optional LLM-backed assignment parsing/coaching/debugging/feedback extraction
+- Later: deeper statistical preflight, relationship checks and project-level evidence validation based on actual GA coursework
 
 ## Current limitations
 
-- The Assignment Deconstructor is deterministic and keyword-driven.
-- Learning Coach lessons are a curated local library rather than generated dynamically.
-- Error Doctor cannot execute the user's actual Excel workbook, SQL database, or Python environment yet.
-- Feedback Memory uses transparent trigger-word/scope matching rather than semantic embeddings or an LLM; this makes the matching explainable but can miss paraphrased lessons.
-- Feedback rules are browser-local in V0.4 and do not sync across devices.
+- Assignment Deconstructor is deterministic and keyword-driven.
+- Learning Coach uses a curated local lesson library.
+- Error Doctor cannot execute the learner's real Excel/SQL/Python runtime.
+- Feedback Memory uses transparent trigger matching rather than semantic embeddings.
+- Dataset Preflight does not infer business meaning and cannot determine whether a field is the *correct* target from data alone.
+- IQR outliers are prompts to inspect values, not automatic evidence that records are wrong.
+- XLS/XLSX parsing requires the SheetJS CDN script to load; CSV remains available without it.
 
-These limitations are intentional for the bootcamp-ready versions: DA.OS works immediately, requires no API key, keeps data local, and can be improved based on real General Assembly coursework rather than hypothetical requirements.
+These limitations are intentional: DA.OS should be bootcamp-ready, understandable and useful before adding opaque automation.
