@@ -1,0 +1,64 @@
+.submission-main { padding-bottom: 56px; }
+.submission-topbar { align-items: flex-start; }
+.gate-hero { display:flex; justify-content:space-between; gap:24px; align-items:stretch; }
+.gate-hero > div:first-child { flex:1; }
+.overall-status { min-width:260px; border:1px solid var(--border, #dfe3e8); border-radius:18px; padding:20px; display:flex; flex-direction:column; justify-content:center; gap:8px; background:#fff; }
+.overall-status span { font-size:11px; letter-spacing:.12em; font-weight:800; color:#6c737f; }
+.overall-status strong { font-size:30px; }
+.overall-status small { color:#6c737f; line-height:1.5; }
+.overall-status.block { border-color:#f0b0b0; background:#fff7f7; }
+.overall-status.warn { border-color:#ead7a4; background:#fffbf0; }
+.overall-status.pass { border-color:#b9dec1; background:#f5fbf6; }
+.overall-status.neutral { background:#f7f8fa; }
+.gate-metrics { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:14px; margin-top:18px; }
+.metric-card { display:flex; flex-direction:column; gap:6px; min-height:126px; justify-content:center; }
+.metric-card span { font-size:11px; letter-spacing:.08em; color:#69717c; font-weight:800; }
+.metric-card strong { font-size:32px; }
+.metric-card small { color:#7a828d; }
+.metric-card.block strong { color:#b42318; }
+.metric-card.warn strong { color:#9a6700; }
+.metric-card.pass strong { color:#147a37; }
+.stale-warning { margin-top:18px; border-color:#f0b0b0; background:#fff7f7; color:#8d1d18; font-weight:700; }
+.manual-card, .result-card, .scope-card { margin-top:18px; }
+.manual-checklist { display:grid; gap:10px; }
+.manual-check { display:grid; grid-template-columns:auto 1fr; gap:12px; align-items:flex-start; border:1px solid #e3e7ec; padding:14px 16px; border-radius:14px; background:#fff; }
+.manual-check.optional { opacity:.72; }
+.manual-check input { margin-top:4px; width:18px; height:18px; }
+.manual-check strong { display:block; margin-bottom:4px; }
+.manual-check p { margin:0; color:#6d7480; line-height:1.5; }
+.manual-check small { display:inline-block; margin-top:7px; padding:3px 8px; border-radius:999px; background:#f1f3f5; color:#606873; font-weight:700; }
+.result-filters { display:flex; flex-wrap:wrap; gap:8px; }
+.gate-result-list { display:grid; gap:10px; }
+.gate-result { display:grid; grid-template-columns:92px 1fr; gap:14px; border:1px solid #e3e7ec; border-radius:15px; padding:15px; background:#fff; }
+.gate-result.block { border-left:5px solid #c9372c; }
+.gate-result.warn { border-left:5px solid #c58a15; }
+.gate-result.pass { border-left:5px solid #218743; }
+.gate-status { font-size:11px; font-weight:900; letter-spacing:.08em; text-transform:uppercase; padding-top:2px; }
+.gate-result.block .gate-status { color:#b42318; }
+.gate-result.warn .gate-status { color:#8b6200; }
+.gate-result.pass .gate-status { color:#147a37; }
+.gate-result h3 { margin:0 0 5px; font-size:16px; }
+.gate-result p { margin:0; color:#68717d; line-height:1.5; }
+.gate-action { margin-top:8px !important; font-weight:700; color:#333c48 !important; }
+.submission-grid { display:grid; grid-template-columns:1fr 1fr; gap:18px; margin-top:18px; }
+.priority-list { display:grid; gap:10px; }
+.priority-item { border:1px solid #e3e7ec; border-radius:13px; padding:13px 14px; }
+.priority-item strong { display:block; margin-bottom:5px; }
+.priority-item p { margin:0; color:#68717d; line-height:1.45; }
+.priority-item.block { background:#fff8f8; border-color:#f0c6c3; }
+.priority-item.warn { background:#fffcf4; border-color:#efdfb7; }
+.scope-grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:14px; }
+.scope-grid > div { border:1px solid #e3e7ec; border-radius:14px; padding:15px; }
+.scope-grid strong { display:block; margin-bottom:7px; }
+.scope-grid p { margin:0; color:#68717d; line-height:1.5; }
+.gate-rule strong { line-height:1.4; }
+@media (max-width: 980px) {
+  .gate-metrics { grid-template-columns:repeat(2,minmax(0,1fr)); }
+  .submission-grid, .scope-grid { grid-template-columns:1fr; }
+  .gate-hero { flex-direction:column; }
+  .overall-status { min-width:0; }
+}
+@media (max-width: 620px) {
+  .gate-metrics { grid-template-columns:1fr 1fr; }
+  .gate-result { grid-template-columns:1fr; gap:6px; }
+}
