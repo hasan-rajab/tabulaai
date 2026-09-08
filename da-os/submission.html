@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="DA.OS Submission Gate — run PASS, WARN and BLOCK checks before submitting a data-analytics assignment." />
+  <title>Submission Gate — DA.OS</title>
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="submission.css" />
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="brand-mark">DA</div>
+        <div><strong>DA.OS</strong><span>Submission Gate</span></div>
+      </div>
+      <nav class="nav" aria-label="Submission Gate navigation">
+        <a class="nav-item" href="index.html" style="text-decoration:none;display:block;">← Workspace</a>
+        <a class="nav-item" href="adapter.html" style="text-decoration:none;display:block;">Assignment Adapter</a>
+        <a class="nav-item" href="preflight.html" style="text-decoration:none;display:block;">Dataset Preflight</a>
+        <a class="nav-item" href="evidence.html" style="text-decoration:none;display:block;">Rubric + Evidence</a>
+        <a class="nav-item" href="coach.html" style="text-decoration:none;display:block;">Learning Coach</a>
+        <a class="nav-item" href="doctor.html" style="text-decoration:none;display:block;">Error Doctor</a>
+        <a class="nav-item" href="memory.html" style="text-decoration:none;display:block;">Feedback Memory</a>
+        <a class="nav-item active" href="submission.html" style="text-decoration:none;display:block;">Submission Gate</a>
+      </nav>
+      <div class="sidebar-footer gate-rule">
+        <p>Gate rule</p>
+        <strong>No missing requirement gets hidden by a polished deliverable.</strong>
+      </div>
+    </aside>
+
+    <main class="main submission-main">
+      <header class="topbar submission-topbar">
+        <div>
+          <p class="eyebrow">DA.OS V0.8 · SUBMISSION GATE</p>
+          <h1>Do not submit until the project survives the gate.</h1>
+        </div>
+        <div class="topbar-actions">
+          <button id="runGateBtn" class="button button-primary">Run gate</button>
+          <button id="exportGateBtn" class="button button-ghost">Export report</button>
+          <a href="index.html" class="button button-ghost" style="text-decoration:none;">Back to project</a>
+        </div>
+      </header>
+
+      <section class="card gate-hero">
+        <div>
+          <p class="section-kicker">CURRENT PROJECT</p>
+          <h2 id="projectName">No project loaded</h2>
+          <p id="projectContext">Load or adapt an assignment before running the final gate.</p>
+        </div>
+        <div id="overallStatus" class="overall-status neutral">
+          <span>OVERALL STATUS</span>
+          <strong>NOT RUN</strong>
+          <small id="overallExplanation">Run the gate when you want a current project check.</small>
+        </div>
+      </section>
+
+      <section class="gate-metrics">
+        <article class="card metric-card block"><span>BLOCK</span><strong id="blockCount">0</strong><small>must resolve</small></article>
+        <article class="card metric-card warn"><span>WARN</span><strong id="warnCount">0</strong><small>review carefully</small></article>
+        <article class="card metric-card pass"><span>PASS</span><strong id="passCount">0</strong><small>checks satisfied</small></article>
+        <article class="card metric-card"><span>VERIFIED COVERAGE</span><strong id="coveragePct">0%</strong><small id="coverageLine">0 criteria</small></article>
+      </section>
+
+      <section id="staleWarning" class="card stale-warning hidden"></section>
+
+      <section class="card manual-card">
+        <div class="card-header">
+          <div>
+            <p class="section-kicker">1 · MANUAL FINAL CHECKS</p>
+            <h2>Confirm the things DA.OS cannot prove from metadata.</h2>
+            <p>These are explicit learner attestations, not automated claims. Relevant unchecked items become blockers because V0.8 cannot inspect your real workbook, database, dashboard or final deck itself.</p>
+          </div>
+          <span id="manualProgress" class="counter">0/0</span>
+        </div>
+        <div id="manualChecklist" class="manual-checklist"></div>
+      </section>
+
+      <section class="card result-card">
+        <div class="card-header">
+          <div>
+            <p class="section-kicker">2 · GATE RESULTS</p>
+            <h2>Exact reasons to stop, review, or proceed.</h2>
+          </div>
+          <div class="result-filters">
+            <button class="filter-chip active" data-result-filter="all">All</button>
+            <button class="filter-chip" data-result-filter="block">Block</button>
+            <button class="filter-chip" data-result-filter="warn">Warn</button>
+            <button class="filter-chip" data-result-filter="pass">Pass</button>
+          </div>
+        </div>
+        <div id="resultList" class="gate-result-list empty-state">Run the submission gate to see checks.</div>
+      </section>
+
+      <section class="submission-grid">
+        <article class="card">
+          <div class="card-header">
+            <div><p class="section-kicker">3 · BLOCKERS</p><h2>Do not submit with these unresolved.</h2></div>
+          </div>
+          <div id="blockerList" class="priority-list empty-state">No gate result yet.</div>
+        </article>
+        <article class="card">
+          <div class="card-header">
+            <div><p class="section-kicker">4 · WARNINGS</p><h2>Things that still need judgment.</h2></div>
+          </div>
+          <div id="warningList" class="priority-list empty-state">No gate result yet.</div>
+        </article>
+      </section>
+
+      <section class="card scope-card">
+        <div class="card-header">
+          <div>
+            <p class="section-kicker">WHAT V0.8 CAN AND CANNOT CLAIM</p>
+            <h2>A PASS is a completeness/QA signal, not a grade guarantee.</h2>
+          </div>
+        </div>
+        <div class="scope-grid">
+          <div><strong>Automated evidence</strong><p>Project tasks, assignment/rubric criteria, V0.7 evidence coverage, stale-map detection, Dataset Preflight metadata and Feedback Memory signals.</p></div>
+          <div><strong>Manual evidence</strong><p>Your explicit confirmations for source-number tracing, visual review, narrative/recommendation support and final-file readiness.</p></div>
+          <div><strong>Not proved</strong><p>Instructor judgment, hidden grading criteria, actual SQL/database execution, workbook correctness, dashboard interactions, factual business correctness, or the grade you will receive.</p></div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  <script src="submission.js"></script>
+</body>
+</html>
