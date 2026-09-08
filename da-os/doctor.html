@@ -1,0 +1,221 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="DA.OS Error Doctor — guided debugging for Excel, SQL and Python bootcamp work." />
+  <title>Error Doctor — DA.OS</title>
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="doctor.css" />
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="brand-mark">DA</div>
+        <div>
+          <strong>DA.OS</strong>
+          <span>Error Doctor</span>
+        </div>
+      </div>
+
+      <nav class="nav" aria-label="Error Doctor navigation">
+        <a class="nav-item" href="index.html" style="text-decoration:none;display:block;">← Workspace</a>
+        <a class="nav-item" href="coach.html" style="text-decoration:none;display:block;">Learning Coach</a>
+        <a class="nav-item active" href="doctor.html" style="text-decoration:none;display:block;">Error Doctor</a>
+      </nav>
+
+      <div class="sidebar-footer doctor-sidebar-footer">
+        <p>Debugging rule</p>
+        <strong>Observe → isolate → test → fix → verify.</strong>
+      </div>
+    </aside>
+
+    <main class="main doctor-main">
+      <header class="topbar doctor-topbar">
+        <div>
+          <p class="eyebrow">DA.OS V0.3 · ERROR DOCTOR</p>
+          <h1>Diagnose the error. Learn the pattern.</h1>
+        </div>
+        <div class="topbar-actions">
+          <a href="coach.html" class="button button-ghost" style="text-decoration:none;">Learning Coach</a>
+          <a href="index.html" class="button button-ghost" style="text-decoration:none;">Back to project</a>
+        </div>
+      </header>
+
+      <section class="card doctor-hero">
+        <div>
+          <p class="section-kicker">CURRENT PROJECT</p>
+          <h2 id="projectName">No project loaded</h2>
+          <p id="projectContext">Error Doctor works without a project, but project context helps you keep your debugging history organised.</p>
+        </div>
+        <div class="doctor-philosophy">
+          <span>ERROR DOCTOR DOES NOT START WITH THE ANSWER</span>
+          <strong>It teaches you how to find the cause.</strong>
+        </div>
+      </section>
+
+      <section class="doctor-grid">
+        <article class="card intake-card">
+          <div class="card-header">
+            <div>
+              <p class="section-kicker">1 · ERROR INTAKE</p>
+              <h2>What broke?</h2>
+            </div>
+          </div>
+
+          <label class="field-label">Tool</label>
+          <div id="doctorTools" class="doctor-tools" role="tablist" aria-label="Debugging tool">
+            <button class="doctor-tool active" data-tool="Excel">Excel</button>
+            <button class="doctor-tool" data-tool="SQL">SQL</button>
+            <button class="doctor-tool" data-tool="Python">Python</button>
+          </div>
+
+          <label>
+            Error message or symptom
+            <textarea id="errorText" rows="6" placeholder="Paste the exact error message, or describe what is wrong with the result..."></textarea>
+          </label>
+
+          <label>
+            Relevant formula / query / code / context
+            <textarea id="codeText" rows="10" spellcheck="false" placeholder="Paste only the smallest relevant formula, SQL query, traceback context, or code block..."></textarea>
+          </label>
+
+          <div class="sample-row">
+            <span>Try a sample:</span>
+            <button class="sample-chip" data-sample="excel">#VALUE!</button>
+            <button class="sample-chip" data-sample="sql">Wrong SQL total</button>
+            <button class="sample-chip" data-sample="python">KeyError</button>
+          </div>
+
+          <button id="diagnoseBtn" class="button button-primary full-button">Start diagnosis</button>
+          <p class="doctor-rule">Paste the exact error whenever possible. Exact messages are much easier to diagnose than “it doesn't work.”</p>
+        </article>
+
+        <article class="card diagnosis-card">
+          <div class="card-header">
+            <div>
+              <p class="section-kicker">2 · DIAGNOSIS</p>
+              <h2 id="diagnosisTitle">No diagnosis yet</h2>
+            </div>
+            <span id="diagnosisConfidence" class="diagnosis-badge">—</span>
+          </div>
+
+          <div id="diagnosisEmpty" class="diagnosis-empty">
+            <strong>Start with evidence.</strong>
+            <p>Choose the tool, paste the exact error or symptom, and add the smallest relevant piece of code. DA.OS will give you the first diagnostic test—not the final answer.</p>
+          </div>
+
+          <div id="diagnosisContent" class="diagnosis-content hidden">
+            <div class="concept-box doctor-concept">
+              <span>LIKELY ERROR CLASS</span>
+              <p id="errorClass">—</p>
+            </div>
+
+            <div class="diagnostic-summary">
+              <span>WHAT THIS USUALLY MEANS</span>
+              <p id="likelyCause">—</p>
+            </div>
+
+            <div class="diagnostic-concept">
+              <span>CONCEPT TO LEARN</span>
+              <p id="conceptToLearn">—</p>
+            </div>
+
+            <div class="step-header">
+              <div>
+                <span>GUIDED TESTS</span>
+                <strong id="stepProgress">0/0</strong>
+              </div>
+              <small>Do each test before revealing the next one.</small>
+            </div>
+            <div id="diagnosticSteps" class="diagnostic-steps"></div>
+
+            <div class="diagnostic-actions">
+              <button id="nextTestBtn" class="button button-primary">Reveal first test</button>
+              <button id="restartBtn" class="button button-ghost">Restart diagnosis</button>
+            </div>
+          </div>
+        </article>
+
+        <article class="card notes-card">
+          <div class="card-header">
+            <div>
+              <p class="section-kicker">3 · DEBUG NOTES</p>
+              <h2>What did each test show?</h2>
+            </div>
+            <span id="notesStatus" class="save-status">Saved locally</span>
+          </div>
+          <textarea id="debugNotes" rows="12" placeholder="Example: print(df.columns) showed 'pledged', not 'pledged_amount'. So the error is probably a column-name mismatch..."></textarea>
+          <div class="debug-prompts">
+            <button class="prompt-chip" data-prompt="What did I expect to happen?">Expected</button>
+            <button class="prompt-chip" data-prompt="What actually happened?">Observed</button>
+            <button class="prompt-chip" data-prompt="What changed immediately before the error appeared?">Last change</button>
+            <button class="prompt-chip" data-prompt="What is the smallest test that can confirm or reject my current hypothesis?">Smallest test</button>
+          </div>
+        </article>
+
+        <article class="card resolution-card">
+          <div class="card-header">
+            <div>
+              <p class="section-kicker">4 · RESOLUTION</p>
+              <h2>Fix only after you understand the cause.</h2>
+            </div>
+            <span id="unlockBadge" class="diagnosis-badge locked">Locked</span>
+          </div>
+
+          <div id="resolutionLocked" class="resolution-locked">
+            Complete at least two diagnostic tests before revealing the fix pattern.
+          </div>
+
+          <div id="resolutionContent" class="hidden">
+            <div class="resolution-section">
+              <span>FIX PATTERN</span>
+              <pre id="fixPattern"></pre>
+            </div>
+            <div class="resolution-section">
+              <span>HOW TO VERIFY</span>
+              <p id="verification">—</p>
+            </div>
+            <div class="resolution-section">
+              <span>HOW TO PREVENT IT NEXT TIME</span>
+              <p id="prevention">—</p>
+            </div>
+          </div>
+
+          <button id="revealFixBtn" class="button button-primary full-button" disabled>Reveal fix pattern</button>
+
+          <label class="reflection-label">
+            What did you learn from this error?
+            <textarea id="learningReflection" rows="5" placeholder="Explain the cause in your own words and what you will check first next time..."></textarea>
+          </label>
+
+          <div class="resolution-actions">
+            <button id="needsReviewBtn" class="button button-ghost" disabled>Save as needs review</button>
+            <button id="solvedBtn" class="button button-primary" disabled>Mark solved</button>
+          </div>
+          <p id="resolutionMessage" class="resolution-message" aria-live="polite"></p>
+        </article>
+      </section>
+
+      <section class="card history-card">
+        <div class="card-header">
+          <div>
+            <p class="section-kicker">DEBUGGING MEMORY</p>
+            <h2>Your repeated error patterns</h2>
+            <p>DA.OS keeps a lightweight local record of errors you solved or marked for review, so repeated problems become recognizable patterns instead of fresh confusion.</p>
+          </div>
+          <div class="history-stats">
+            <div><strong id="solvedCount">0</strong><span>solved</span></div>
+            <div><strong id="reviewCount">0</strong><span>review</span></div>
+          </div>
+        </div>
+        <div id="historyList" class="history-list empty-state">No debugging sessions saved yet.</div>
+      </section>
+    </main>
+  </div>
+
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  <script src="doctor.js"></script>
+</body>
+</html>
