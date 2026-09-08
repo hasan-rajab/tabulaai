@@ -1,8 +1,8 @@
-# DA.OS V0.7 — Data Analyst Bootcamp OS
+# DA.OS V0.8 — Data Analyst Bootcamp OS
 
-DA.OS is a local-first personal operating system for an intensive data-analytics bootcamp. The goal is to accept whatever assignment the learner is actually given, turn it into an explicit workflow, support the work, and preserve enough evidence to know what is genuinely complete before submission.
+DA.OS is a local-first operating system for intensive data-analytics coursework. It is designed around one requirement: **whatever assignment the learner receives, the system should help interpret it, execute it, retain proof, learn from mistakes, and stop avoidable submission errors.**
 
-## V0.7 flow
+## V0.8 flow
 
 ```text
 ANY ASSIGNMENT
@@ -21,119 +21,58 @@ Rubric + Evidence Engine
       ↓
 Feedback Memory
       ↓
-Submission Gate (V0.8)
+V0.8 Submission Gate
+      ↓
+PASS / WARN / BLOCK
 ```
 
-The recommended entry point is the **Universal Assignment Adapter**. The older keyword-based Deconstructor remains available as a quick fallback.
+## Current modules
 
-## Modules
+### Project Workspace + NEXT
+- project name, deadline, tool selection and assignment brief
+- local file metadata
+- execution checklist and progress
+- first unfinished task shown as the next best action
+- direct routes into the specialist modules
 
-### 1. Project Workspace
-- Project name and deadline
-- Tool selection: Excel, SQL, Power BI, Tableau, Python
-- Full assignment brief
-- Local file metadata list
-- Browser-local persistence with `localStorage`
-- Export project state as JSON
+### Universal Assignment Adapter
+Accepts pasted instructions/rubrics or locally extracts supported text from PDF, DOCX, TXT, Markdown, SQL, Python, Jupyter notebooks, JSON and CSV.
 
-### 2. Universal Assignment Adapter
-Input can be:
-- pasted assignment brief
-- pasted rubric / grading criteria
-- locally extracted PDF
-- locally extracted DOCX
-- TXT / Markdown
-- SQL / Python source files
-- Jupyter notebooks (`.ipynb`)
-- JSON
-- CSV text
+It detects likely work types including data cleaning, EDA, Excel, SQL, Python/pandas, statistics, Power BI, Tableau, dashboard work, presentations, business cases and capstones. It extracts deliverables, constraints, grading signals, required tools and ambiguities, then generates a task graph.
 
-It detects likely assignment types such as:
-- data cleaning
-- exploratory analysis / EDA
-- Excel analysis
-- SQL exercise
-- Python / pandas
-- statistics
-- dashboard work
-- Power BI
-- Tableau
-- presentation / deck
-- business case / recommendations
-- capstone / end-to-end project
-- generic analytics fallback
+Each generated task includes:
+- what to do
+- why it matters
+- what evidence to retain
+- how to validate the result
 
-It also extracts likely deliverables, explicit constraints, rubric lines, percentage/point weights, required tools, work-mode signals and ambiguities. It then builds a task graph appropriate to the detected assignment.
-
-Every generated task contains:
-- **title**
-- **why**
-- **action**
-- **category**
-- **evidence** — what artifact should prove the step was completed
-- **validation** — how the learner should verify the work
-
-**Use this plan in DA.OS** writes the result into the shared project state and routes into NEXT.
-
-### 3. Quick Deconstructor
-The original deterministic keyword-driven deconstructor remains available for short/simple briefs.
-
-### 4. NEXT engine
-- Finds the first unfinished task
-- Shows exactly what to do next and why
-- Displays upcoming work and progress
-- Links to Assignment Adapter, Rubric + Evidence, Dataset Preflight, Learning Coach, Error Doctor and Feedback Memory
-- Surfaces relevant Feedback Memory rules before continuing
-
-### 5. Dataset Preflight
-Supported input:
-- CSV
-- XLSX
-- XLS
-
-Profiles up to the first 100,000 rows for:
+### Dataset Preflight
+Profiles CSV/XLS/XLSX data locally for:
 - rows / columns
 - duplicates
-- missing values
-- inferred field types
+- missingness
+- inferred types
 - cardinality
-- numeric ranges and summary statistics
-- IQR-based outliers
+- numeric ranges / summary statistics
+- IQR outliers
 - date ranges
-- common values
-- likely identifiers / measures / time / dimensions / targets
+- likely identifiers, measures, dimensions and targets
 
 Raw dataset rows are not persisted in localStorage.
 
-### 6. Learning Coach
-- Reads the current NEXT task
-- Supports Excel, SQL, Python, Power BI and Tableau
-- Uses reasoning → structure → validation → worked-pattern hints
-- Saves scratch work and understood/needs-review state locally
+### Learning Coach
+Supports Excel, SQL, Python, Power BI and Tableau using a reasoning → structure → validation → worked-pattern hint ladder.
 
-### 7. Error Doctor
-- Guided Excel / SQL / Python debugging
-- Starts from the exact error or wrong-result symptom
-- Reveals diagnostic tests before the fix
-- Stores solved vs needs-review debugging patterns locally
+### Error Doctor
+Guided Excel / SQL / Python debugging that reveals diagnostic tests before the fix and preserves repeated debugging patterns.
 
-### 8. Mistake + Instructor Feedback Memory
-- Saves corrections from instructor, self-review, peer or reviewer
-- Separates original correction from permanent lesson
-- Supports Blocker / Warning / Tip rules
-- Matches rules against future assignment/NEXT context
-- Tracks acknowledgement and origin project/task
+### Feedback Memory
+Stores instructor/self/peer corrections as reusable Blocker / Warning / Tip rules that can reappear in later project context.
 
-### 9. V0.7 Rubric + Evidence Engine
-V0.7 converts the assignment's explicit criteria into a live coverage matrix.
+### Rubric + Evidence Engine (V0.7)
+Builds a live coverage matrix from Adapter deliverables, constraints and rubric lines (or project requirements as a fallback).
 
-Criteria sources:
-- Adapter deliverables
-- Adapter constraints
-- Adapter rubric lines
-- Fallback project requirements when Adapter metadata is unavailable
-
-For each criterion, DA.OS tracks three states:
+Each criterion moves through:
 
 ```text
 MISSING
@@ -143,58 +82,62 @@ EVIDENCE ADDED
 VERIFIED
 ```
 
-**Missing** means no evidence is linked.  
-**Evidence added** means an artifact/reference exists but has not yet been checked against the criterion.  
-**Verified** means the learner explicitly inspected the evidence and confirmed it satisfies the linked criterion(s).
+Evidence can represent files, calculations, SQL, notebook output, dashboards, visuals, slides, screenshots, written explanations and validation checks. Raw evidence file bytes are not stored; optional file selection retains metadata only.
 
-Evidence can represent:
-- file / artifact
-- calculation / metric
-- SQL query
-- Python / notebook output
-- chart / visual
-- dashboard
-- slide / presentation
-- screenshot
-- written explanation
-- validation check
-- other project proof
+Coverage metrics are **evidence coverage, not grade predictions**.
 
-Each evidence record can store:
-- evidence type
-- title
-- reference/location (for example `query_03.sql`, `Sheet1!PivotTable2`, dashboard KPI card, slide number)
-- optional local file metadata
-- notes explaining what the evidence proves
-- one or more linked criterion IDs
-- verified / needs-verification state
+## V0.8 Submission Gate
 
-Raw evidence files are **not** stored in localStorage. When a learner selects a local evidence file, V0.7 stores metadata such as filename, size, type and modified timestamp only.
+Submission Gate is the final project check. It combines existing DA.OS state with explicit manual confirmations and returns:
 
-#### Coverage metrics
-V0.7 shows:
-- total explicit criteria
-- criteria with no evidence
-- criteria with evidence added but not verified
-- verified criteria
-- verified criteria coverage percentage
-- verified percentage of detected rubric weight when percentage weights are available
+- **BLOCK** — do not submit while this remains unresolved
+- **WARN** — no hard stop, but judgment/review is still required
+- **PASS** — this check is satisfied
 
-These are **evidence-coverage metrics, not grade predictions**.
+### Automated checks
+V0.8 checks, where applicable:
+- whether a project/assignment exists
+- whether explicit rubric/deliverable/constraint criteria exist
+- criteria with no linked evidence
+- evidence linked but not explicitly verified
+- stale V0.7 evidence maps after an assignment/rubric change
+- unfinished final-QA tasks
+- other unfinished workflow tasks
+- whether a Dataset Preflight profile exists for data-oriented work
+- high-severity issues in the latest preflight profile
+- truncated preflight profiles
+- project mismatch between current work and saved preflight profile
+- active blocker-level Feedback Memory rules that match the project context
 
-#### Assignment sync protection
-V0.7 stores a deterministic signature of the current assignment criteria. If the assignment/rubric changes after evidence has been recorded, the engine warns that the map is stale. **Sync from assignment** refreshes criteria and removes only obsolete criterion links while retaining evidence records themselves.
+### Manual final checks
+Some things cannot be proved from browser metadata because DA.OS does not execute or inspect every real workbook, database, dashboard or deck.
 
-#### Task proof plan
-The page also exposes the V0.6 task-level **Evidence expected** and **Validation** instructions so a checked NEXT task cannot silently imply that proof exists.
+V0.8 therefore requires explicit learner confirmation for the relevant items:
+- original brief/rubric re-read against final outputs
+- headline numbers traced back to source calculations
+- visual labels/units/sorting/filters reviewed
+- narrative and recommendations checked against the actual evidence
+- final files opened and checked for correct version/format/name
+- material assumptions/limitations disclosed where relevant
 
-#### Evidence export
-The evidence map can be exported as JSON containing:
-- project summary
-- coverage summary
-- criteria + status
-- evidence register
-- task proof plan
+Relevant unchecked manual checks become **BLOCK** items.
+
+### Overall status
+- any BLOCK → overall `BLOCK`
+- no BLOCK but at least one WARN → overall `WARN`
+- no BLOCK and no WARN → overall `PASS`
+
+A PASS means **no current completeness/QA warning was detected by the checks available to DA.OS**. It does **not** guarantee a grade, instructor approval, hidden-rubric compliance, or factual business correctness.
+
+### Export
+The Submission Gate report can be exported as JSON with:
+- overall status
+- BLOCK / WARN / PASS counts
+- verified criterion coverage
+- weighted rubric evidence coverage (if detected)
+- stale-map state
+- all individual checks and next actions
+- manual-check confirmations
 
 ## Quick start
 
@@ -214,28 +157,28 @@ http://localhost:8000
 Main pages:
 
 ```text
-/index.html      Workspace + quick Deconstructor + NEXT
-/adapter.html    Universal Assignment Adapter
-/evidence.html   Rubric + Evidence Engine
-/preflight.html  Dataset Preflight
-/coach.html      Learning Coach
-/doctor.html     Error Doctor
-/memory.html     Mistake + Instructor Feedback Memory
+/index.html       Workspace + quick Deconstructor + NEXT
+/adapter.html     Universal Assignment Adapter
+/evidence.html    Rubric + Evidence Engine
+/preflight.html   Dataset Preflight
+/coach.html       Learning Coach
+/doctor.html      Error Doctor
+/memory.html      Feedback Memory
+/submission.html  Submission Gate
 ```
 
 ## Privacy
 
 DA.OS remains local-first.
 
-- Project/assignment text is stored in browser `localStorage` only when committed to the DA.OS project.
-- Assignment files loaded into Adapter are read locally; source bytes are not uploaded by DA.OS.
-- Adapter source-file metadata may be saved with the project, not source contents.
-- Dataset Preflight reads selected data locally and does not persist raw rows.
-- Rubric + Evidence stores evidence descriptions, references, criterion links and optional file metadata — not raw evidence file bytes.
-- Learning, debugging and feedback-memory records remain browser-local.
+- project/assignment text is stored in browser localStorage when committed to the project
+- assignment source files are read locally and are not uploaded by DA.OS
+- Dataset Preflight does not persist raw data rows
+- Rubric + Evidence does not persist raw evidence file bytes
+- Submission Gate reads existing DA.OS local state and stores only manual-check state / last-run metadata
 
 External browser libraries currently used:
-- SheetJS for XLS/XLSX parsing in Dataset Preflight
+- SheetJS for XLS/XLSX parsing
 - PDF.js for PDF assignment-text extraction
 - Mammoth.js for DOCX assignment-text extraction
 
@@ -243,48 +186,43 @@ Storage keys:
 - `daos-v0.1-state` — shared project state
 - `daos-v0.2-coach` — Learning Coach
 - `daos-v0.3-doctor` — Error Doctor
-- `daos-v0.4-feedback-memory` — personal feedback rules
+- `daos-v0.4-feedback-memory` — feedback rules
 - `daos-v0.5-preflight` — dataset profile summary only
-- `daos-v0.7-evidence` — evidence register, criterion links and assignment signature
+- `daos-v0.7-evidence` — evidence register + assignment signature
+- `daos-v0.8-submission` — manual final checks + last-run timestamp
 
 ## Design principles
 
-1. **Adapt before executing.**
-2. **Plan from explicit deliverables and constraints.**
-3. **Inspect data before analysing.**
-4. **Reason before revealing answers.**
-5. **Done is not the same as proven.**
-6. **Evidence added is not the same as verified.**
-7. **Validate outputs rather than merely making code/formulas run.**
-8. **Preserve instructor feedback so mistakes do not repeat.**
-9. **No fake certainty or fake grade estimates.**
-10. **Keep raw files/data local and transient where possible.**
-11. **Make the learner more independent over time.**
+1. Adapt before executing.
+2. Plan from explicit deliverables and constraints.
+3. Inspect data before analysing.
+4. Reason before revealing answers.
+5. Done is not the same as proven.
+6. Evidence added is not the same as verified.
+7. A polished output can still be wrong.
+8. Do not hide uncertainty behind a single fake score.
+9. Keep raw files/data local and transient where possible.
+10. Make the learner more independent over time.
 
-## Roadmap after V0.7
-
-### V0.8 — Submission Gate
-Cross-check requirements, data, calculations, visuals, narrative, recommendations, feedback rules and evidence coverage using PASS / WARN / BLOCK states before submission.
+## Next planned modules
 
 ### V0.9 — Unified “I'm stuck” Router
 One intake that routes the learner to Assignment Adapter, Dataset Preflight, Learning Coach, Error Doctor, Feedback Memory, Rubric + Evidence or Submission Gate based on the problem described.
 
 ### V1.0 — Optional AI reasoning layer
-Use AI for ambiguous/unusual briefs and semantic interpretation while keeping deterministic state, validation, evidence and privacy-oriented fallbacks.
+Use AI for ambiguous/unusual briefs and semantic interpretation while retaining deterministic state, evidence, validation and privacy-oriented fallbacks.
 
 Portfolio mode remains later, after real GA projects exist.
 
 ## Current limitations
 
-- Assignment classification is transparent pattern/rule analysis rather than semantic AI reasoning.
-- Rubric parsing recognizes visible text and simple percentage/point patterns.
-- V0.7 does not inspect the contents of linked evidence files; verification is an explicit learner action.
-- A verified evidence item linked to multiple criteria assumes the learner checked it against all selected criteria.
-- V0.7 does not predict marks or instructor judgment.
-- PDF extraction requires selectable/extractable text; scanned-image PDFs need OCR or pasted text.
-- PPTX assignment-text extraction and screenshot OCR are not yet supported.
-- Learning Coach uses a curated local lesson library.
-- Error Doctor cannot execute the learner's real Excel/SQL/Python runtime.
-- Feedback Memory uses transparent trigger matching rather than semantic embeddings.
+- assignment classification is deterministic pattern/rule analysis rather than semantic AI reasoning
+- rubric extraction understands visible/simple criteria and weights, not hidden instructor expectations
+- V0.7 does not inspect raw linked evidence file contents
+- V0.8 cannot independently execute SQL, Excel formulas, Python notebooks, Power BI interactions or Tableau workbooks
+- V0.8 relies on explicit learner confirmations for checks that require actual artifact inspection
+- Dataset Preflight flags possible issues; it does not prove that an outlier or missing value is wrong
+- PDF extraction requires selectable text; scanned PDFs need OCR or pasted text
+- PPTX instruction extraction and screenshot OCR are not yet supported
 
-These limitations are intentional: DA.OS should remain understandable, auditable and useful before opaque automation is added.
+These limitations are intentional: DA.OS should remain transparent about what it knows and what still requires human judgment.
