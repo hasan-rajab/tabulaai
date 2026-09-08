@@ -17,139 +17,33 @@
       </div>
       <nav class="nav" aria-label="Assignment Adapter navigation">
         <a class="nav-item" href="index.html" style="text-decoration:none;display:block;">← Workspace</a>
+        <a class="nav-item" href="router.html" style="text-decoration:none;display:block;">I'm Stuck</a>
         <a class="nav-item active" href="adapter.html" style="text-decoration:none;display:block;">Assignment Adapter</a>
         <a class="nav-item" href="preflight.html" style="text-decoration:none;display:block;">Dataset Preflight</a>
         <a class="nav-item" href="coach.html" style="text-decoration:none;display:block;">Learning Coach</a>
         <a class="nav-item" href="doctor.html" style="text-decoration:none;display:block;">Error Doctor</a>
         <a class="nav-item" href="memory.html" style="text-decoration:none;display:block;">Feedback Memory</a>
       </nav>
-      <div class="sidebar-footer">
-        <p>Adapter rule</p>
-        <strong>Brief → deliverables → task graph → evidence → validation.</strong>
-      </div>
+      <div class="sidebar-footer"><p>Adapter rule</p><strong>Brief → deliverables → task graph → evidence → validation.</strong></div>
     </aside>
-
     <main class="main adapter-main">
-      <header class="topbar">
-        <div>
-          <p class="eyebrow">DA.OS V0.6 · UNIVERSAL ASSIGNMENT ADAPTER</p>
-          <h1>Give it the work. Get the right workflow.</h1>
-        </div>
-        <div class="topbar-actions">
-          <button id="sampleBtn" class="button button-ghost">Load mixed-project sample</button>
-          <button id="resetBtn" class="button button-ghost">Reset</button>
-          <a href="index.html" class="button button-ghost" style="text-decoration:none;">Back to project</a>
-        </div>
-      </header>
-
-      <section class="card adapter-hero">
-        <div>
-          <p class="section-kicker">PURPOSE</p>
-          <h2>One intake for whatever GA gives you.</h2>
-          <p>Paste the brief, rubric, or extracted instructions. DA.OS classifies the assignment, identifies deliverables and constraints, builds a task graph for the actual work, and defines what evidence should prove each step is complete.</p>
-        </div>
-        <div class="adapter-philosophy">
-          <span>DETERMINISTIC CORE</span>
-          <strong>No assignment type is assumed in advance.</strong>
-          <small>V0.6 uses transparent pattern/rule analysis and always shows what it inferred so you can correct it.</small>
-        </div>
-      </section>
-
+      <header class="topbar"><div><p class="eyebrow">DA.OS V0.6 · UNIVERSAL ASSIGNMENT ADAPTER</p><h1>Give it the work. Get the right workflow.</h1></div><div class="topbar-actions"><button id="sampleBtn" class="button button-ghost">Load mixed-project sample</button><button id="resetBtn" class="button button-ghost">Reset</button><a href="index.html" class="button button-ghost" style="text-decoration:none;">Back to project</a></div></header>
+      <section class="card adapter-hero"><div><p class="section-kicker">PURPOSE</p><h2>One intake for whatever GA gives you.</h2><p>Paste the brief, rubric, or extracted instructions. DA.OS classifies the assignment, identifies deliverables and constraints, builds a task graph for the actual work, and defines what evidence should prove each step is complete.</p></div><div class="adapter-philosophy"><span>DETERMINISTIC CORE</span><strong>No assignment type is assumed in advance.</strong><small>V0.6 uses transparent pattern/rule analysis and always shows what it inferred so you can correct it.</small></div></section>
       <section class="adapter-grid">
-        <article class="card intake-card">
-          <div class="card-header">
-            <div><p class="section-kicker">1 · ASSIGNMENT INTAKE</p><h2>What did they give you?</h2></div>
-          </div>
-
-          <label>
-            Project / assignment name
-            <input id="assignmentName" type="text" placeholder="e.g. Customer Churn Analysis" />
-          </label>
-
-          <label>
-            Assignment brief
-            <textarea id="assignmentBrief" rows="14" placeholder="Paste the full assignment instructions here. Include questions, deliverables, tool requirements, limits and submission instructions..."></textarea>
-          </label>
-
-          <label>
-            Rubric / grading criteria (optional)
-            <textarea id="rubricText" rows="9" placeholder="Paste the grading rubric, marking scheme or instructor checklist here..."></textarea>
-          </label>
-
-          <label id="assignmentDropzone" class="adapter-dropzone">
-            <input id="assignmentFile" type="file" accept=".pdf,.docx,.txt,.md,.sql,.py,.ipynb,.json,.csv" />
-            <strong>Or load an assignment file locally</strong>
-            <span>PDF, DOCX, TXT, MD, SQL, PY, IPYNB, JSON, CSV</span>
-            <small>Text is extracted in your browser. The source file is not uploaded by DA.OS.</small>
-          </label>
-          <div id="fileStatus" class="file-summary empty-state">No assignment file loaded.</div>
-
-          <div class="action-row adapter-action-row">
-            <button id="analyseBtn" class="button button-primary">Analyse assignment</button>
-            <button id="usePlanBtn" class="button button-ghost" disabled>Use this plan in DA.OS</button>
-          </div>
-        </article>
-
-        <aside class="card quick-summary-card">
-          <div class="card-header"><div><p class="section-kicker">2 · ADAPTER SUMMARY</p><h2>What DA.OS thinks this is</h2></div><span id="confidenceBadge" class="adapter-badge neutral">Not analysed</span></div>
-          <div class="summary-block"><span>ASSIGNMENT TYPE</span><div id="typeChips" class="chip-cloud empty-state">—</div></div>
-          <div class="summary-block"><span>TOOLS DETECTED</span><div id="toolChips" class="chip-cloud empty-state">—</div></div>
-          <div class="summary-block"><span>WORK MODE</span><strong id="workMode">—</strong></div>
-          <div class="summary-block"><span>FIRST DECISION</span><p id="firstDecision">Analyse an assignment to see the first thing that must be clarified.</p></div>
-          <div id="ambiguityBox" class="ambiguity-box hidden"></div>
-        </aside>
+        <article class="card intake-card"><div class="card-header"><div><p class="section-kicker">1 · ASSIGNMENT INTAKE</p><h2>What did they give you?</h2></div></div><label>Project / assignment name<input id="assignmentName" type="text" placeholder="e.g. Customer Churn Analysis" /></label><label>Assignment brief<textarea id="assignmentBrief" rows="14" placeholder="Paste the full assignment instructions here. Include questions, deliverables, tool requirements, limits and submission instructions..."></textarea></label><label>Rubric / grading criteria (optional)<textarea id="rubricText" rows="9" placeholder="Paste the grading rubric, marking scheme or instructor checklist here..."></textarea></label><label id="assignmentDropzone" class="adapter-dropzone"><input id="assignmentFile" type="file" accept=".pdf,.docx,.txt,.md,.sql,.py,.ipynb,.json,.csv" /><strong>Or load an assignment file locally</strong><span>PDF, DOCX, TXT, MD, SQL, PY, IPYNB, JSON, CSV</span><small>Text is extracted in your browser. The source file is not uploaded by DA.OS.</small></label><div id="fileStatus" class="file-summary empty-state">No assignment file loaded.</div><div class="action-row adapter-action-row"><button id="analyseBtn" class="button button-primary">Analyse assignment</button><button id="usePlanBtn" class="button button-ghost" disabled>Use this plan in DA.OS</button></div></article>
+        <aside class="card quick-summary-card"><div class="card-header"><div><p class="section-kicker">2 · ADAPTER SUMMARY</p><h2>What DA.OS thinks this is</h2></div><span id="confidenceBadge" class="adapter-badge neutral">Not analysed</span></div><div class="summary-block"><span>ASSIGNMENT TYPE</span><div id="typeChips" class="chip-cloud empty-state">—</div></div><div class="summary-block"><span>TOOLS DETECTED</span><div id="toolChips" class="chip-cloud empty-state">—</div></div><div class="summary-block"><span>WORK MODE</span><strong id="workMode">—</strong></div><div class="summary-block"><span>FIRST DECISION</span><p id="firstDecision">Analyse an assignment to see the first thing that must be clarified.</p></div><div id="ambiguityBox" class="ambiguity-box hidden"></div></aside>
       </section>
-
-      <section class="result-grid">
-        <article class="card">
-          <div class="card-header"><div><p class="section-kicker">3 · DELIVERABLES</p><h2>What must exist at the end</h2></div><span id="deliverableCount" class="counter">0</span></div>
-          <div id="deliverableList" class="adapter-list empty-state">No assignment analysed yet.</div>
-        </article>
-
-        <article class="card">
-          <div class="card-header"><div><p class="section-kicker">4 · CONSTRAINTS</p><h2>Rules you cannot accidentally ignore</h2></div><span id="constraintCount" class="counter">0</span></div>
-          <div id="constraintList" class="adapter-list empty-state">No constraints detected yet.</div>
-        </article>
-      </section>
-
-      <section class="card rubric-card">
-        <div class="card-header"><div><p class="section-kicker">5 · RUBRIC COVERAGE</p><h2>What you may be graded on</h2></div><span id="rubricCount" class="counter">0</span></div>
-        <div id="rubricList" class="rubric-list empty-state">Paste a rubric or include grading language in the brief.</div>
-      </section>
-
-      <section class="card task-graph-card">
-        <div class="card-header">
-          <div><p class="section-kicker">6 · EXECUTION GRAPH</p><h2>The workflow for this assignment</h2><p class="muted-copy">Each step includes the reason, evidence to keep, and a validation criterion. This graph can replace the generic project plan in DA.OS.</p></div>
-          <span id="taskCount" class="counter">0</span>
-        </div>
-        <div id="taskGraph" class="task-graph empty-state">No task graph yet.</div>
-      </section>
-
-      <section class="result-grid">
-        <article class="card">
-          <div class="card-header"><div><p class="section-kicker">7 · SUBMISSION EVIDENCE</p><h2>Proof you actually completed the work</h2></div></div>
-          <div id="evidenceList" class="adapter-list empty-state">No evidence plan yet.</div>
-        </article>
-        <article class="card">
-          <div class="card-header"><div><p class="section-kicker">8 · VALIDATION PLAN</p><h2>How to know it is correct</h2></div></div>
-          <div id="validationList" class="adapter-list empty-state">No validation plan yet.</div>
-        </article>
-      </section>
-
-      <section class="card commit-card">
-        <div>
-          <p class="section-kicker">SEND TO DA.OS</p>
-          <h2>Make this the active project plan.</h2>
-          <p>The adapter writes the brief, detected tools, requirements and task graph into the existing DA.OS project state. NEXT, Learning Coach, Error Doctor, Feedback Memory and Dataset Preflight can then work from the same project.</p>
-        </div>
-        <button id="usePlanBottomBtn" class="button button-primary" disabled>Use this plan in DA.OS</button>
-      </section>
+      <section class="result-grid"><article class="card"><div class="card-header"><div><p class="section-kicker">3 · DELIVERABLES</p><h2>What must exist at the end</h2></div><span id="deliverableCount" class="counter">0</span></div><div id="deliverableList" class="adapter-list empty-state">No assignment analysed yet.</div></article><article class="card"><div class="card-header"><div><p class="section-kicker">4 · CONSTRAINTS</p><h2>Rules you cannot accidentally ignore</h2></div><span id="constraintCount" class="counter">0</span></div><div id="constraintList" class="adapter-list empty-state">No constraints detected yet.</div></article></section>
+      <section class="card rubric-card"><div class="card-header"><div><p class="section-kicker">5 · RUBRIC COVERAGE</p><h2>What you may be graded on</h2></div><span id="rubricCount" class="counter">0</span></div><div id="rubricList" class="rubric-list empty-state">Paste a rubric or include grading language in the brief.</div></section>
+      <section class="card task-graph-card"><div class="card-header"><div><p class="section-kicker">6 · EXECUTION GRAPH</p><h2>The workflow for this assignment</h2><p class="muted-copy">Each step includes the reason, evidence to keep, and a validation criterion. This graph can replace the generic project plan in DA.OS.</p></div><span id="taskCount" class="counter">0</span></div><div id="taskGraph" class="task-graph empty-state">No task graph yet.</div></section>
+      <section class="result-grid"><article class="card"><div class="card-header"><div><p class="section-kicker">7 · SUBMISSION EVIDENCE</p><h2>Proof you actually completed the work</h2></div></div><div id="evidenceList" class="adapter-list empty-state">No evidence plan yet.</div></article><article class="card"><div class="card-header"><div><p class="section-kicker">8 · VALIDATION PLAN</p><h2>How to know it is correct</h2></div></div><div id="validationList" class="adapter-list empty-state">No validation plan yet.</div></article></section>
+      <section class="card commit-card"><div><p class="section-kicker">SEND TO DA.OS</p><h2>Make this the active project plan.</h2><p>The adapter writes the brief, detected tools, requirements and task graph into the existing DA.OS project state. NEXT, Learning Coach, Error Doctor, Feedback Memory and Dataset Preflight can then work from the same project.</p></div><button id="usePlanBottomBtn" class="button button-primary" disabled>Use this plan in DA.OS</button></section>
     </main>
   </div>
-
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
   <script src="https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/mammoth@1.8.0/mammoth.browser.min.js"></script>
   <script src="adapter.js"></script>
+  <script src="stuck-launcher.js"></script>
 </body>
 </html>
