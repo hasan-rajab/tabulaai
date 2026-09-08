@@ -1,8 +1,8 @@
-# DA.OS V0.1 — Data Analyst Bootcamp OS
+# DA.OS V0.2 — Data Analyst Bootcamp OS
 
-DA.OS is a lightweight personal operating system for intensive data-analytics bootcamps. The first version is deliberately narrow: it keeps one project organised, turns an assignment brief into an executable checklist, and always shows the next best action.
+DA.OS is a lightweight personal operating system for an intensive data-analytics bootcamp. It keeps each project organised, turns an assignment brief into an executable checklist, always shows the next best action, and now coaches the learner through that action without immediately giving away the answer.
 
-## V0.1 features
+## V0.2 features
 
 ### 1. Project Workspace
 - Project name and deadline
@@ -25,6 +25,45 @@ DA.OS is a lightweight personal operating system for intensive data-analytics bo
 - Lets the learner mark it complete and immediately move on
 - Displays the next five queued tasks and total progress
 
+### 4. Learning Coach
+- Reads the current NEXT task automatically
+- Supports Excel, SQL, Python, Power BI and Tableau learning paths
+- Uses a four-level hint ladder:
+  1. reasoning prompt
+  2. tool structure
+  3. validation approach
+  4. worked pattern/example
+- Keeps examples hidden until the final hint
+- Provides task-aware teaching for:
+  - dataset inspection and cleaning
+  - success/outcome metrics
+  - duration analysis
+  - pledge-goal bands
+  - category comparisons
+  - launch timing
+  - SQL work
+  - Python work
+  - visualisation
+  - recommendations
+  - QA/submission checks
+- Includes a local scratchpad for formulas, SQL structure, reasoning and notes
+- Adds prompt chips for business question, numerator/denominator, data grain and validation
+- Requires a four-part self-check before a concept can be marked understood
+- Tracks `understood` and `needs review` learning states in the browser
+
+## How to use it
+
+1. Open the DA.OS workspace.
+2. Create a project or load the Kickstarter sample.
+3. Paste the assignment brief and run **Deconstruct assignment**.
+4. Open **NEXT** to see the current action.
+5. Click **Coach me through this** or open **Learning Coach** from the sidebar.
+6. Choose the tool you are using.
+7. Attempt the reasoning before revealing hints.
+8. Use the scratchpad to work through the step.
+9. Complete the self-check and mark the concept as understood, or flag it for review.
+10. Return to the project and continue to the next task.
+
 ## Quick start
 
 No build step is required.
@@ -43,20 +82,39 @@ You can also open `index.html` directly in a modern browser, although running a 
 
 ## Privacy
 
-V0.1 is fully client-side. Project text and file metadata are stored in the browser's local storage. File contents are **not** uploaded or persisted by the app.
+V0.2 remains fully client-side. Project text, file metadata, coach scratchpads, hint progress and learning status are stored in the browser's local storage. File contents are **not** uploaded or persisted by the app.
 
 ## Design principle
 
-DA.OS should help the learner understand and execute the work — not invisibly do the assignment for them. Future coaching features should therefore explain concepts, guide debugging, and preserve instructor feedback rather than simply returning finished answers.
+DA.OS should make the learner more capable, not make the learner dependent on the tool.
+
+The Learning Coach therefore follows this sequence:
+
+```text
+Think → Hint → Structure → Validate → Example
+```
+
+It intentionally avoids opening with a finished formula, query or analysis.
+
+## Current architecture
+
+- `index.html` — Workspace, Assignment Deconstructor and NEXT UI
+- `app.js` — project state, deterministic brief parsing, task generation and NEXT logic
+- `styles.css` — main DA.OS design system
+- `coach.html` — Learning Coach UI
+- `coach.js` — task-aware lesson and hint engine
+- `coach.css` — coach-specific interface styles
+
+Project state continues to use the original `daos-v0.1-state` local-storage key so existing V0.1 projects remain compatible. Learning records are stored separately under `daos-v0.2-coach`.
 
 ## Roadmap
 
-- V0.2: Learning Coach for Excel / SQL / Python
-- V0.3: Error Doctor with guided debugging
+- V0.3: Error Doctor with guided debugging for Excel, SQL and Python
 - V0.4: Mistake + instructor-feedback memory
 - V0.5: Dataset preflight and field profiling
 - V0.6: Portfolio mode for completed bootcamp projects
+- Later: optional LLM-backed coaching while preserving the deterministic, no-API fallback
 
 ## Current limitation
 
-The assignment deconstructor in V0.1 is deterministic and keyword-driven. This is intentional: the app works without an API key and can be tested immediately. A later version can add an optional LLM-backed parser while keeping the deterministic workflow as a fallback.
+The V0.2 coach is deterministic rather than conversational AI. This is intentional for the first bootcamp-ready version: it works without an API key, preserves privacy, and gives predictable teaching behavior. The next logical intelligence upgrade is the Error Doctor, where the learner can paste a real error and receive guided diagnostic questions instead of a one-shot fix.
