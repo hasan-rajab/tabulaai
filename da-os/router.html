@@ -15,6 +15,7 @@
       <nav class="nav" aria-label="Router navigation">
         <a class="nav-item" href="index.html" style="text-decoration:none;display:block;">← Workspace</a>
         <a class="nav-item active" href="router.html" style="text-decoration:none;display:block;">I'm Stuck</a>
+        <a class="nav-item" href="ai.html" style="text-decoration:none;display:block;">AI Reasoning</a>
         <a class="nav-item" href="adapter.html" style="text-decoration:none;display:block;">Assignment Adapter</a>
         <a class="nav-item" href="preflight.html" style="text-decoration:none;display:block;">Dataset Preflight</a>
         <a class="nav-item" href="coach.html" style="text-decoration:none;display:block;">Learning Coach</a>
@@ -28,15 +29,15 @@
 
     <main class="main router-main">
       <header class="topbar">
-        <div><p class="eyebrow">DA.OS V0.9 · UNIFIED ROUTER</p><h1>Tell DA.OS what is blocking you.</h1></div>
-        <div class="topbar-actions"><button id="sampleBtn" class="button button-ghost">Try examples</button><button id="clearBtn" class="button button-ghost">Clear</button><a href="index.html" class="button button-ghost" style="text-decoration:none;">Back to project</a></div>
+        <div><p class="eyebrow">DA.OS V1.0 · UNIFIED ROUTER</p><h1>Tell DA.OS what is blocking you.</h1></div>
+        <div class="topbar-actions"><button id="sampleBtn" class="button button-ghost">Try examples</button><button id="clearBtn" class="button button-ghost">Clear</button><a href="ai.html" class="button button-ghost" style="text-decoration:none;">AI settings</a><a href="index.html" class="button button-ghost" style="text-decoration:none;">Back to project</a></div>
       </header>
 
       <section class="card router-hero">
         <div>
           <p class="section-kicker">ONE INTAKE</p>
           <h2>You should not need to know which DA.OS feature you need.</h2>
-          <p>Describe the situation in normal language. The router uses your words plus the current project state to choose the most relevant workflow and explain why.</p>
+          <p>Describe the situation in normal language. The deterministic router uses your words plus current project state first; V1.0 can optionally ask AI to reconsider an ambiguous route without replacing the deterministic recommendation automatically.</p>
         </div>
         <div class="router-context" id="projectContext"><span>CURRENT CONTEXT</span><strong>No project loaded</strong><small>You can still route a general problem.</small></div>
       </section>
@@ -89,5 +90,6 @@
 
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
   <script src="router.js"></script>
+  <script src="stuck-launcher.js"></script>
 </body>
 </html>
