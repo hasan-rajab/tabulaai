@@ -5,4 +5,5 @@
   if(!path.endsWith('/ai.html'))addPill('daos-ai-launcher','ai.html','AI',64,'#334155');
   function load(src){return new Promise((resolve,reject)=>{if([...document.scripts].some(s=>s.src.endsWith('/'+src)||s.getAttribute('src')===src)){resolve();return;}const s=document.createElement('script');s.src=src;s.onload=resolve;s.onerror=reject;document.body.appendChild(s);});}
   if(path.endsWith('/adapter.html'))load('ai-client.js').then(()=>load('ai-adapter.js')).catch(()=>{});
+  if(path.endsWith('/router.html'))load('ai-client.js').then(()=>load('ai-router.js')).catch(()=>{});
 })();
