@@ -27,7 +27,7 @@
   async function runReview(){
     if(!currentSettings().enabled){status.className='adapter-badge low';status.textContent='AI disabled';showToast('Enable AI reasoning in AI settings first.');return;}
     if(!analysis){analyseAssignment();if(!analysis)return;}
-    status.className='adapter-badge moderate';status.textContent='Reviewing…';runBtn.disabled=true;
+    status.className='adapter-badge medium';status.textContent='Reviewing…';runBtn.disabled=true;
     resultBox.className='ai-review-result';resultBox.textContent='Semantic review in progress…';
     try{
       const deterministic={
@@ -41,7 +41,8 @@
       const response=await window.DAOSAI.reason('assignment_refine',{assignmentName:analysis.name,brief:analysis.brief,rubric:analysis.rubricText,deterministic});
       reviewPayload={result:response.result,model:response.model,createdAt:new Date().toISOString()};
       renderReview();
-      status.className=`adapter-badge ${String(response.result.confidence||'moderate').toLowerCase()==='high'?'high':'moderate'}`;
+      const confidence=String(response.result.confidence||'moderate').toLowerCase();
+      status.className=`adapter-badge ${confidence==='high'?'high':confidence==='low'?'low':'medium'}`;
       status.textContent=`AI ${response.result.confidence||'review'}`;
     }catch(error){status.className='adapter-badge low';status.textContent='AI unavailable';resultBox.className='ai-review-result empty-state';resultBox.textContent=`AI review unavailable: ${error.message}. The deterministic plan is unchanged.`;}
     finally{runBtn.disabled=false;}
