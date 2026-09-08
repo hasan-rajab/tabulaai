@@ -22,6 +22,7 @@
       <nav class="nav" aria-label="Coach navigation">
         <a class="nav-item" href="index.html" style="text-decoration:none;display:block;">← Workspace</a>
         <a class="nav-item active" href="coach.html" style="text-decoration:none;display:block;">Learning Coach</a>
+        <a class="nav-item" href="doctor.html" style="text-decoration:none;display:block;">Error Doctor</a>
       </nav>
 
       <div class="sidebar-footer coach-sidebar-footer">
@@ -33,10 +34,13 @@
     <main class="main coach-main">
       <header class="topbar coach-topbar">
         <div>
-          <p class="eyebrow">DA.OS V0.2 · LEARNING COACH</p>
+          <p class="eyebrow">DA.OS V0.3 · LEARNING COACH</p>
           <h1 id="coachHeading">Learn the next step, don't outsource it.</h1>
         </div>
-        <a href="index.html" class="button button-ghost" style="text-decoration:none;">Back to project</a>
+        <div class="topbar-actions">
+          <a href="doctor.html" class="button button-ghost" style="text-decoration:none;">Something broke</a>
+          <a href="index.html" class="button button-ghost" style="text-decoration:none;">Back to project</a>
+        </div>
       </header>
 
       <section class="coach-hero card">
@@ -134,7 +138,7 @@
         <div>
           <p class="section-kicker">LEARNING RECORD</p>
           <h2>What DA.OS remembers</h2>
-          <p>The coach saves your scratchpad, hint progress, and whether this task needs review or feels understood. V0.2 keeps all of this in your browser.</p>
+          <p>The coach saves your scratchpad, hint progress, and whether this task needs review or feels understood. Error Doctor separately remembers debugging patterns you solve. Everything remains in your browser in V0.3.</p>
         </div>
         <div class="learning-stats">
           <div><strong id="understoodCount">0</strong><span>understood</span></div>
