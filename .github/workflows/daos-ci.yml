@@ -1,0 +1,61 @@
+name: DA.OS CI
+
+on:
+  pull_request:
+    paths:
+      - 'da-os/**'
+      - '.github/workflows/daos-ci.yml'
+  push:
+    branches:
+      - da-os-v0.1
+    paths:
+      - 'da-os/**'
+      - '.github/workflows/daos-ci.yml'
+
+jobs:
+  syntax-and-smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Compile AI proxy
+        run: python -m py_compile da-os/server.py
+
+      - name: Check JavaScript syntax
+        shell: bash
+        run: |
+          set -euo pipefail
+          for file in da-os/*.js; do
+            echo "Checking $file"
+            node --check "$file"
+          done
+
+      - name: Smoke-test local server without AI key
+        shell: bash
+        run: |
+          set -euo pipefail
+          DAOS_PORT=8765 python da-os/server.py >/tmp/daos-server.log 2>&1 &
+          server_pid=$!
+          trap 'kill $server_pid 2>/dev/null || true' EXIT
+          for i in {1..20}; do
+            if curl -fsS http://127.0.0.1:8765/api/health >/tmp/daos-health.json; then
+              break
+            fi
+            sleep 0.25
+          done
+          cat /tmp/daos-health.json
+          grep -q '"ok": true' /tmp/daos-health.json
+          grep -q '"aiConfigured": false' /tmp/daos-health.json
+          curl -fsS http://127.0.0.1:8765/index.html | grep -q 'DA.OS'
