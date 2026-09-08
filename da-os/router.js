@@ -7,7 +7,7 @@ const ROUTER_KEY='daos-v0.9-router';
 const ROUTE_CONTEXT_KEY='daos-v0.9-route-context';
 
 const $=id=>document.getElementById(id);
-const els={problemText:$('problemText'),routeBtn:$('routeBtn'),sampleBtn:$('sampleBtn'),clearBtn:$('clearBtn'),clearHistoryBtn:$('clearHistoryBtn'),projectContext:$('projectContext'),stateSignals:$('stateSignals'),routeResult:$('routeResult'),routeTitle:$('routeTitle'),routeWhy:$('routeWhy'),routeConfidence:$('routeConfidence'),routeScore:$('routeScore'),routeAction:$('routeAction'),routeEvidence:$('routeEvidence'),goBtn:$('goBtn'),rethinkBtn:$('rethinkBtn'),alternativesSection:$('alternativesSection'),alternativesList:$('alternativesList'),routeHistory:$('routeHistory'),toast:$('toast')};
+const els={problemText:$('problemText'),routeBtn:$('routeBtn'),sampleBtn:$('sampleBtn'),clearBtn:$('clearBtn'),clearHistoryBtn:$('clearHistoryBtn'),quickPrompts:$('quickPrompts'),projectContext:$('projectContext'),stateSignals:$('stateSignals'),routeResult:$('routeResult'),routeTitle:$('routeTitle'),routeWhy:$('routeWhy'),routeConfidence:$('routeConfidence'),routeScore:$('routeScore'),routeAction:$('routeAction'),routeEvidence:$('routeEvidence'),goBtn:$('goBtn'),rethinkBtn:$('rethinkBtn'),alternativesSection:$('alternativesSection'),alternativesList:$('alternativesList'),routeHistory:$('routeHistory'),toast:$('toast')};
 
 const DESTINATIONS={
   adapter:{name:'Universal Assignment Adapter',url:'adapter.html',action:'Open the assignment brief/rubric and rebuild the requirements, constraints and task graph before doing more work.',why:'Use this when the problem is understanding what the assignment actually requires.'},
@@ -42,7 +42,6 @@ function projectLoaded(){return Boolean(context.project?.project?.name||context.
 function unfinishedCount(){return(context.project?.tasks||[]).filter(t=>!t.done).length}
 function evidenceCount(){return(context.evidence?.evidence||[]).length}
 function feedbackCount(){return(context.memory?.rules||[]).filter(r=>r.active!==false).length}
-function relevantProblem(text,regex){return regex.test(text)}
 
 function scoreRoutes(problem){
   const scores=Object.fromEntries(Object.keys(DESTINATIONS).map(k=>[k,{score:0,signals:[]}]))
@@ -72,40 +71,20 @@ function routeProblem(){
   context=loadContext();
   const raw=els.problemText.value.trim();
   if(raw.length<4){showToast('Describe what is blocking you first.');els.problemText.focus();return;}
-  const problem=normalize(raw);const scores=scoreRoutes(problem);
+  const problem=normalize(raw),scores=scoreRoutes(problem);
   const ranked=Object.entries(scores).map(([key,v])=>({key,...v,...DESTINATIONS[key]})).sort((a,b)=>b.score-a.score||a.name.localeCompare(b.name));
-  const top=ranked[0],second=ranked[1];
-  const margin=top.score-second.score;
+  const top=ranked[0],second=ranked[1],margin=top.score-second.score;
   const confidence=top.score>=14&&margin>=5?'High':top.score>=7&&margin>=2?'Moderate':'Low';
   lastRouting={problem:raw,recommended:top.key,confidence,ranked,createdAt:new Date().toISOString(),projectName:context.project?.project?.name||null,currentTask:currentTask()?.title||null};
   localStorage.setItem(ROUTE_CONTEXT_KEY,JSON.stringify(lastRouting));
-  saveHistory(lastRouting);
-  renderRoute(lastRouting);renderHistory();
+  saveHistory(lastRouting);renderRoute(lastRouting);renderHistory();
 }
 
-function renderRoute(result){
-  const top=result.ranked[0];els.routeResult.classList.remove('hidden');els.routeTitle.textContent=top.name;els.routeWhy.textContent=top.why;els.routeAction.textContent=top.action;els.routeConfidence.textContent=result.confidence;els.routeScore.textContent=`route score ${top.score} · lead ${top.score-result.ranked[1].score}`;els.goBtn.href=top.url;els.goBtn.textContent=`Open ${top.name} →`;
-  const signals=[...new Set(top.signals)].slice(0,5);els.routeEvidence.innerHTML=signals.map(s=>`<span class="route-signal-chip">${escapeHtml(s)}</span>`).join('');
-  els.alternativesSection.classList.add('hidden');
-}
+function renderRoute(result){const top=result.ranked[0];els.routeResult.classList.remove('hidden');els.routeTitle.textContent=top.name;els.routeWhy.textContent=top.why;els.routeAction.textContent=top.action;els.routeConfidence.textContent=result.confidence;els.routeScore.textContent=`route score ${top.score} · lead ${top.score-result.ranked[1].score}`;els.goBtn.href=top.url;els.goBtn.textContent=`Open ${top.name} →`;const signals=[...new Set(top.signals)].slice(0,5);els.routeEvidence.innerHTML=signals.map(s=>`<span class="route-signal-chip">${escapeHtml(s)}</span>`).join('');els.alternativesSection.classList.add('hidden');}
 function renderAlternatives(){if(!lastRouting)return;const items=lastRouting.ranked.slice(1,4);els.alternativesList.innerHTML=items.map(item=>`<div class="alternative"><h3>${escapeHtml(item.name)}</h3><p>${escapeHtml(item.why)}</p><small>score ${item.score}</small><a href="${item.url}">Open →</a></div>`).join('');els.alternativesSection.classList.remove('hidden');}
-
-function renderContext(){
-  context=loadContext();const project=context.project?.project?.name;const task=currentTask();
-  els.projectContext.innerHTML=project?`<span>CURRENT PROJECT</span><strong>${escapeHtml(project)}</strong><small>${task?`NEXT: ${escapeHtml(task.title)}`:'No unfinished NEXT task detected.'}</small>`:`<span>CURRENT CONTEXT</span><strong>No project loaded</strong><small>You can still route a general problem.</small>`;
-  const signals=[
-    {label:'Project',value:project?'Loaded':'Not loaded',tone:project?'good':'neutral'},
-    {label:'NEXT queue',value:project?`${unfinishedCount()} unfinished`:'—',tone:unfinishedCount()?'warn':'good'},
-    {label:'Dataset Preflight',value:context.preflight?'Available':'None saved',tone:context.preflight?'good':'neutral'},
-    {label:'Evidence register',value:`${evidenceCount()} item(s)`,tone:evidenceCount()?'good':'neutral'},
-    {label:'Feedback rules',value:`${feedbackCount()} active`,tone:feedbackCount()?'good':'neutral'},
-    {label:'Submission QA',value:context.submission?.lastRunAt?'Run before':'Not run yet',tone:context.submission?.lastRunAt?'good':'neutral'}
-  ];
-  els.stateSignals.innerHTML=signals.map(s=>`<div class="state-signal ${s.tone}"><strong>${escapeHtml(s.label)}</strong><span>${escapeHtml(s.value)}</span></div>`).join('');
-}
-
+function renderContext(){context=loadContext();const project=context.project?.project?.name,task=currentTask();els.projectContext.innerHTML=project?`<span>CURRENT PROJECT</span><strong>${escapeHtml(project)}</strong><small>${task?`NEXT: ${escapeHtml(task.title)}`:'No unfinished NEXT task detected.'}</small>`:`<span>CURRENT CONTEXT</span><strong>No project loaded</strong><small>You can still route a general problem.</small>`;const signals=[{label:'Project',value:project?'Loaded':'Not loaded',tone:project?'good':'neutral'},{label:'NEXT queue',value:project?`${unfinishedCount()} unfinished`:'—',tone:unfinishedCount()?'warn':'good'},{label:'Dataset Preflight',value:context.preflight?'Available':'None saved',tone:context.preflight?'good':'neutral'},{label:'Evidence register',value:`${evidenceCount()} item(s)`,tone:evidenceCount()?'good':'neutral'},{label:'Feedback rules',value:`${feedbackCount()} active`,tone:feedbackCount()?'good':'neutral'},{label:'Submission QA',value:context.submission?.lastRunAt?'Run before':'Not run yet',tone:context.submission?.lastRunAt?'good':'neutral'}];els.stateSignals.innerHTML=signals.map(s=>`<div class="state-signal ${s.tone}"><strong>${escapeHtml(s.label)}</strong><span>${escapeHtml(s.value)}</span></div>`).join('');}
 function saveHistory(route){const saved=loadJson(ROUTER_KEY)||{version:'0.9.0',history:[]};const entry={id:crypto.randomUUID(),problem:route.problem,recommended:route.recommended,confidence:route.confidence,createdAt:route.createdAt,projectName:route.projectName};saved.history=[entry,...(saved.history||[])].slice(0,12);localStorage.setItem(ROUTER_KEY,JSON.stringify(saved));}
-function renderHistory(){const saved=loadJson(ROUTER_KEY);const history=saved?.history||[];if(!history.length){els.routeHistory.className='route-history empty-state';els.routeHistory.textContent='No routing history yet.';return;}els.routeHistory.className='route-history';els.routeHistory.innerHTML=history.map(item=>`<div class="history-row"><div><strong>${escapeHtml(DESTINATIONS[item.recommended]?.name||item.recommended)}</strong><p>${escapeHtml(item.problem)}</p></div><span>${formatDate(item.createdAt)} · ${escapeHtml(item.confidence)}</span></div>`).join('');}
+function renderHistory(){const saved=loadJson(ROUTER_KEY),history=saved?.history||[];if(!history.length){els.routeHistory.className='route-history empty-state';els.routeHistory.textContent='No routing history yet.';return;}els.routeHistory.className='route-history';els.routeHistory.innerHTML=history.map(item=>`<div class="history-row"><div><strong>${escapeHtml(DESTINATIONS[item.recommended]?.name||item.recommended)}</strong><p>${escapeHtml(item.problem)}</p></div><span>${formatDate(item.createdAt)} · ${escapeHtml(item.confidence)}</span></div>`).join('');}
 function clearHistory(){localStorage.removeItem(ROUTER_KEY);renderHistory();showToast('Routing history cleared.');}
 function clearCurrent(){els.problemText.value='';lastRouting=null;els.routeResult.classList.add('hidden');els.alternativesSection.classList.add('hidden');}
 function loadExamples(){const examples=["I don't understand what this assignment wants me to deliver.","My SQL total doubled after I joined two tables.","I have a new Excel dataset and don't know what to clean first.","I know I need a Power BI chart but don't know which one to use.","My instructor said my recommendations are just observations.","I finished everything. Am I safe to submit?"];els.problemText.value=examples[Math.floor(Math.random()*examples.length)];routeProblem();}
