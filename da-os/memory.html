@@ -11,194 +11,23 @@
 <body>
   <div class="app-shell">
     <aside class="sidebar">
-      <div class="brand">
-        <div class="brand-mark">DA</div>
-        <div>
-          <strong>DA.OS</strong>
-          <span>Feedback Memory</span>
-        </div>
-      </div>
-
-      <nav class="nav" aria-label="Feedback Memory navigation">
-        <a class="nav-item" href="index.html" style="text-decoration:none;display:block;">← Workspace</a>
-        <a class="nav-item" href="coach.html" style="text-decoration:none;display:block;">Learning Coach</a>
-        <a class="nav-item" href="doctor.html" style="text-decoration:none;display:block;">Error Doctor</a>
-        <a class="nav-item active" href="memory.html" style="text-decoration:none;display:block;">Feedback Memory</a>
-      </nav>
-
-      <div class="sidebar-footer memory-sidebar-footer">
-        <p>Memory principle</p>
-        <strong>Learn the lesson once. Check it forever.</strong>
-      </div>
+      <div class="brand"><div class="brand-mark">DA</div><div><strong>DA.OS</strong><span>Feedback Memory</span></div></div>
+      <nav class="nav" aria-label="Feedback Memory navigation"><a class="nav-item" href="index.html" style="text-decoration:none;display:block;">← Workspace</a><a class="nav-item" href="router.html" style="text-decoration:none;display:block;">I'm Stuck</a><a class="nav-item" href="coach.html" style="text-decoration:none;display:block;">Learning Coach</a><a class="nav-item" href="doctor.html" style="text-decoration:none;display:block;">Error Doctor</a><a class="nav-item active" href="memory.html" style="text-decoration:none;display:block;">Feedback Memory</a></nav>
+      <div class="sidebar-footer memory-sidebar-footer"><p>Memory principle</p><strong>Learn the lesson once. Check it forever.</strong></div>
     </aside>
-
     <main class="main memory-main">
-      <header class="topbar memory-topbar">
-        <div>
-          <p class="eyebrow">DA.OS V0.4 · MISTAKE + INSTRUCTOR FEEDBACK MEMORY</p>
-          <h1>Turn corrections into rules you stop repeating.</h1>
-        </div>
-        <div class="topbar-actions">
-          <a href="coach.html" class="button button-ghost" style="text-decoration:none;">Learning Coach</a>
-          <a href="doctor.html" class="button button-ghost" style="text-decoration:none;">Error Doctor</a>
-          <a href="index.html" class="button button-ghost" style="text-decoration:none;">Back to project</a>
-        </div>
-      </header>
-
-      <section class="card memory-hero">
-        <div>
-          <p class="section-kicker">CURRENT PROJECT</p>
-          <h2 id="projectName">No project loaded</h2>
-          <p id="projectContext">Feedback Memory works without a project, but current NEXT context makes future matching stronger.</p>
-        </div>
-        <div class="memory-stats">
-          <div><strong id="ruleCount">0</strong><span>active rules</span></div>
-          <div><strong id="matchCount">0</strong><span>current matches</span></div>
-          <div><strong id="ackCount">0</strong><span>checks acknowledged</span></div>
-        </div>
-      </section>
-
+      <header class="topbar memory-topbar"><div><p class="eyebrow">DA.OS V0.4 · MISTAKE + INSTRUCTOR FEEDBACK MEMORY</p><h1>Turn corrections into rules you stop repeating.</h1></div><div class="topbar-actions"><a href="coach.html" class="button button-ghost" style="text-decoration:none;">Learning Coach</a><a href="doctor.html" class="button button-ghost" style="text-decoration:none;">Error Doctor</a><a href="index.html" class="button button-ghost" style="text-decoration:none;">Back to project</a></div></header>
+      <section class="card memory-hero"><div><p class="section-kicker">CURRENT PROJECT</p><h2 id="projectName">No project loaded</h2><p id="projectContext">Feedback Memory works without a project, but current NEXT context makes future matching stronger.</p></div><div class="memory-stats"><div><strong id="ruleCount">0</strong><span>active rules</span></div><div><strong id="matchCount">0</strong><span>current matches</span></div><div><strong id="ackCount">0</strong><span>checks acknowledged</span></div></div></section>
       <section class="memory-grid">
-        <article class="card capture-card">
-          <div class="card-header">
-            <div>
-              <p class="section-kicker">1 · CAPTURE THE CORRECTION</p>
-              <h2>What did you learn?</h2>
-            </div>
-            <span id="saveStatus" class="save-status">Saved locally</span>
-          </div>
-
-          <div class="form-grid">
-            <label>
-              Source
-              <select id="source">
-                <option>Instructor</option>
-                <option>Self</option>
-                <option>Peer</option>
-                <option>Reviewer</option>
-              </select>
-            </label>
-            <label>
-              Applies to
-              <select id="toolScope">
-                <option>Any</option>
-                <option>Excel</option>
-                <option>SQL</option>
-                <option>Python</option>
-                <option>Power BI</option>
-                <option>Tableau</option>
-                <option>Statistics</option>
-                <option>Presentation</option>
-              </select>
-            </label>
-          </div>
-
-          <div class="form-grid">
-            <label>
-              Category
-              <select id="category">
-                <option>Analysis reasoning</option>
-                <option>Metric definition</option>
-                <option>Data quality</option>
-                <option>SQL / joins</option>
-                <option>Statistics</option>
-                <option>Visualisation</option>
-                <option>Communication</option>
-                <option>Process</option>
-              </select>
-            </label>
-            <label>
-              Severity
-              <select id="severity">
-                <option value="warning">Warning</option>
-                <option value="blocker">Blocker</option>
-                <option value="tip">Tip</option>
-              </select>
-            </label>
-          </div>
-
-          <label>
-            What happened / what was corrected?
-            <textarea id="correction" rows="5" placeholder="Example: My instructor said I described the chart but did not turn the finding into a recommendation."></textarea>
-          </label>
-
-          <label>
-            Permanent lesson
-            <textarea id="lesson" rows="5" placeholder="Example: Every major finding must end with a specific action the business should take, plus the evidence supporting it."></textarea>
-          </label>
-
-          <label>
-            Trigger words
-            <input id="triggers" type="text" placeholder="recommendation, finding, presentation, insight" />
-            <small class="field-help">DA.OS can suggest these from the correction, lesson, and current NEXT task. Separate with commas.</small>
-          </label>
-
-          <div class="action-row">
-            <button id="suggestBtn" class="button button-ghost">Suggest triggers</button>
-            <button id="saveRuleBtn" class="button button-primary">Save as personal rule</button>
-          </div>
-
-          <div class="sample-row">
-            <span>Try a sample:</span>
-            <button class="prompt-chip" data-sample="recommendation">Recommendation feedback</button>
-            <button class="prompt-chip" data-sample="sorting">Chart sorting mistake</button>
-            <button class="prompt-chip" data-sample="metric">Metric denominator mistake</button>
-          </div>
-        </article>
-
-        <article class="card check-card">
-          <div class="card-header">
-            <div>
-              <p class="section-kicker">2 · CURRENT-TASK CHECK</p>
-              <h2>What should you remember right now?</h2>
-            </div>
-            <button id="checkNowBtn" class="button button-ghost">Check now</button>
-          </div>
-
-          <div class="current-task-box">
-            <span>CURRENT NEXT TASK</span>
-            <strong id="currentTask">No task loaded</strong>
-            <p id="currentTaskContext">Create a project and deconstruct the assignment to enable task-aware matching.</p>
-          </div>
-
-          <div id="matchList" class="match-list empty-state">No matching personal rules yet.</div>
-        </article>
+        <article class="card capture-card"><div class="card-header"><div><p class="section-kicker">1 · CAPTURE THE CORRECTION</p><h2>What did you learn?</h2></div><span id="saveStatus" class="save-status">Saved locally</span></div><div class="form-grid"><label>Source<select id="source"><option>Instructor</option><option>Self</option><option>Peer</option><option>Reviewer</option></select></label><label>Applies to<select id="toolScope"><option>Any</option><option>Excel</option><option>SQL</option><option>Python</option><option>Power BI</option><option>Tableau</option><option>Statistics</option><option>Presentation</option></select></label></div><div class="form-grid"><label>Category<select id="category"><option>Analysis reasoning</option><option>Metric definition</option><option>Data quality</option><option>SQL / joins</option><option>Statistics</option><option>Visualisation</option><option>Communication</option><option>Process</option></select></label><label>Severity<select id="severity"><option value="warning">Warning</option><option value="blocker">Blocker</option><option value="tip">Tip</option></select></label></div><label>What happened / what was corrected?<textarea id="correction" rows="5" placeholder="Example: My instructor said I described the chart but did not turn the finding into a recommendation."></textarea></label><label>Permanent lesson<textarea id="lesson" rows="5" placeholder="Example: Every major finding must end with a specific action the business should take, plus the evidence supporting it."></textarea></label><label>Trigger words<input id="triggers" type="text" placeholder="recommendation, finding, presentation, insight" /><small class="field-help">DA.OS can suggest these from the correction, lesson, and current NEXT task. Separate with commas.</small></label><div class="action-row"><button id="suggestBtn" class="button button-ghost">Suggest triggers</button><button id="saveRuleBtn" class="button button-primary">Save as personal rule</button></div><div class="sample-row"><span>Try a sample:</span><button class="prompt-chip" data-sample="recommendation">Recommendation feedback</button><button class="prompt-chip" data-sample="sorting">Chart sorting mistake</button><button class="prompt-chip" data-sample="metric">Metric denominator mistake</button></div></article>
+        <article class="card check-card"><div class="card-header"><div><p class="section-kicker">2 · CURRENT-TASK CHECK</p><h2>What should you remember right now?</h2></div><button id="checkNowBtn" class="button button-ghost">Check now</button></div><div class="current-task-box"><span>CURRENT NEXT TASK</span><strong id="currentTask">No task loaded</strong><p id="currentTaskContext">Create a project and deconstruct the assignment to enable task-aware matching.</p></div><div id="matchList" class="match-list empty-state">No matching personal rules yet.</div></article>
       </section>
-
-      <section class="card library-card">
-        <div class="card-header library-header">
-          <div>
-            <p class="section-kicker">3 · YOUR ANALYTICS MEMORY</p>
-            <h2>Saved personal rules</h2>
-          </div>
-          <div class="library-controls">
-            <select id="filterScope" aria-label="Filter rules">
-              <option value="all">All rules</option>
-              <option value="active">Active only</option>
-              <option value="blocker">Blockers</option>
-              <option value="warning">Warnings</option>
-              <option value="tip">Tips</option>
-            </select>
-            <input id="searchRules" type="search" placeholder="Search memory…" aria-label="Search feedback memory" />
-          </div>
-        </div>
-        <div id="rulesList" class="rules-list empty-state">No feedback rules saved yet.</div>
-      </section>
-
-      <section class="card philosophy-card">
-        <div>
-          <p class="section-kicker">WHY THIS EXISTS</p>
-          <h2>Instructor feedback should compound.</h2>
-          <p>Every correction becomes more valuable when it protects future work. DA.OS keeps the original context, the lesson, the source, and the situations where the lesson should reappear.</p>
-        </div>
-        <div class="memory-flow" aria-label="Feedback memory workflow">
-          <span>Correction</span><b>→</b><span>Personal rule</span><b>→</b><span>Future task check</span><b>→</b><span>Acknowledge</span>
-        </div>
-      </section>
+      <section class="card library-card"><div class="card-header library-header"><div><p class="section-kicker">3 · YOUR ANALYTICS MEMORY</p><h2>Saved personal rules</h2></div><div class="library-controls"><select id="filterScope" aria-label="Filter rules"><option value="all">All rules</option><option value="active">Active only</option><option value="blocker">Blockers</option><option value="warning">Warnings</option><option value="tip">Tips</option></select><input id="searchRules" type="search" placeholder="Search memory…" aria-label="Search feedback memory" /></div></div><div id="rulesList" class="rules-list empty-state">No feedback rules saved yet.</div></section>
+      <section class="card philosophy-card"><div><p class="section-kicker">WHY THIS EXISTS</p><h2>Instructor feedback should compound.</h2><p>Every correction becomes more valuable when it protects future work. DA.OS keeps the original context, the lesson, the source, and the situations where the lesson should reappear.</p></div><div class="memory-flow" aria-label="Feedback memory workflow"><span>Correction</span><b>→</b><span>Personal rule</span><b>→</b><span>Future task check</span><b>→</b><span>Acknowledge</span></div></section>
     </main>
   </div>
-
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
   <script src="memory.js"></script>
+  <script src="stuck-launcher.js"></script>
 </body>
 </html>
