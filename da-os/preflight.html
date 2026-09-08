@@ -1,0 +1,211 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="DA.OS Dataset Preflight — inspect CSV/XLSX data locally before beginning analysis." />
+  <title>Dataset Preflight — DA.OS</title>
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="preflight.css" />
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="brand-mark">DA</div>
+        <div>
+          <strong>DA.OS</strong>
+          <span>Dataset Preflight</span>
+        </div>
+      </div>
+
+      <nav class="nav" aria-label="Dataset Preflight navigation">
+        <a class="nav-item" href="index.html" style="text-decoration:none;display:block;">← Workspace</a>
+        <a class="nav-item" href="coach.html" style="text-decoration:none;display:block;">Learning Coach</a>
+        <a class="nav-item" href="doctor.html" style="text-decoration:none;display:block;">Error Doctor</a>
+        <a class="nav-item" href="memory.html" style="text-decoration:none;display:block;">Feedback Memory</a>
+        <a class="nav-item active" href="preflight.html" style="text-decoration:none;display:block;">Dataset Preflight</a>
+      </nav>
+
+      <div class="sidebar-footer">
+        <p>Preflight rule</p>
+        <strong>Understand the data before analysing it.</strong>
+      </div>
+    </aside>
+
+    <main class="main preflight-main">
+      <header class="topbar">
+        <div>
+          <p class="eyebrow">DA.OS V0.5 · DATASET PREFLIGHT</p>
+          <h1>Know what is wrong before you start.</h1>
+        </div>
+        <div class="topbar-actions">
+          <button id="exportBtn" class="button button-ghost" disabled>Export profile</button>
+          <button id="newDatasetBtn" class="button button-primary">New dataset</button>
+          <a href="index.html" class="button button-ghost" style="text-decoration:none;">Back to project</a>
+        </div>
+      </header>
+
+      <section class="card preflight-hero">
+        <div>
+          <p class="section-kicker">CURRENT PROJECT</p>
+          <h2 id="projectName">No project loaded</h2>
+          <p id="projectContext">Preflight works independently, but project context helps connect the dataset to your assignment.</p>
+        </div>
+        <div class="privacy-note">
+          <span>LOCAL-FIRST</span>
+          <strong>Your dataset stays in this browser session.</strong>
+          <small>DA.OS stores only the generated profile summary in localStorage. It does not upload or persist the raw file.</small>
+        </div>
+      </section>
+
+      <section class="preflight-grid">
+        <article class="card upload-card">
+          <div class="card-header">
+            <div>
+              <p class="section-kicker">1 · LOAD DATA</p>
+              <h2>Choose a CSV or Excel workbook</h2>
+            </div>
+          </div>
+
+          <label id="datasetDropzone" class="dataset-dropzone">
+            <input id="datasetInput" type="file" accept=".csv,.xlsx,.xls,text/csv,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel" />
+            <strong>Drop your dataset here</strong>
+            <span>CSV, XLSX or XLS</span>
+            <small>CSV works fully offline. Excel parsing uses the browser-loaded SheetJS library; the file itself remains local.</small>
+          </label>
+
+          <div id="fileSummary" class="file-summary empty-state">No dataset loaded.</div>
+
+          <div id="sheetChooserWrap" class="sheet-chooser hidden">
+            <label>
+              Workbook sheet
+              <select id="sheetChooser"></select>
+            </label>
+            <button id="profileSheetBtn" class="button button-primary">Profile selected sheet</button>
+          </div>
+
+          <div class="sample-actions">
+            <span>Need to test it?</span>
+            <button id="sampleBtn" class="sample-chip">Load sample dataset</button>
+          </div>
+        </article>
+
+        <article class="card summary-card">
+          <div class="card-header">
+            <div>
+              <p class="section-kicker">2 · SNAPSHOT</p>
+              <h2>Dataset health</h2>
+            </div>
+            <span id="healthBadge" class="health-badge neutral">Not profiled</span>
+          </div>
+
+          <div class="summary-metrics">
+            <div><strong id="rowCount">—</strong><span>rows</span></div>
+            <div><strong id="columnCount">—</strong><span>columns</span></div>
+            <div><strong id="duplicateCount">—</strong><span>duplicate rows</span></div>
+            <div><strong id="issueCount">—</strong><span>issues</span></div>
+          </div>
+
+          <div id="healthExplanation" class="health-explanation empty-state">Load a dataset to generate the preflight summary.</div>
+        </article>
+      </section>
+
+      <section class="card issues-card">
+        <div class="card-header">
+          <div>
+            <p class="section-kicker">3 · ISSUES TO CHECK</p>
+            <h2>What could damage the analysis?</h2>
+          </div>
+          <div class="issue-filters">
+            <button class="filter-chip active" data-issue-filter="all">All</button>
+            <button class="filter-chip" data-issue-filter="high">High</button>
+            <button class="filter-chip" data-issue-filter="medium">Medium</button>
+            <button class="filter-chip" data-issue-filter="low">Low</button>
+          </div>
+        </div>
+        <div id="issuesList" class="issues-list empty-state">No profile yet.</div>
+      </section>
+
+      <section class="card fields-card">
+        <div class="card-header">
+          <div>
+            <p class="section-kicker">4 · FIELD PROFILE</p>
+            <h2>Understand every column</h2>
+          </div>
+          <label class="field-search">
+            <span>Search</span>
+            <input id="fieldSearch" type="text" placeholder="column name or type" />
+          </label>
+        </div>
+        <div class="table-wrap">
+          <table class="profile-table">
+            <thead>
+              <tr>
+                <th>Column</th>
+                <th>Type</th>
+                <th>Missing</th>
+                <th>Unique</th>
+                <th>Range / common values</th>
+                <th>Role signal</th>
+              </tr>
+            </thead>
+            <tbody id="fieldTableBody">
+              <tr><td colspan="6" class="empty-cell">Load a dataset to inspect fields.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="recommendation-grid">
+        <article class="card">
+          <div class="card-header">
+            <div>
+              <p class="section-kicker">5 · LIKELY ANALYTICAL ROLES</p>
+              <h2>What might matter?</h2>
+            </div>
+          </div>
+          <div class="role-block">
+            <span>POSSIBLE TARGET / OUTCOME</span>
+            <div id="targetSuggestions" class="suggestion-list empty-state">No suggestions yet.</div>
+          </div>
+          <div class="role-block">
+            <span>USEFUL DIMENSIONS / SEGMENTS</span>
+            <div id="dimensionSuggestions" class="suggestion-list empty-state">No suggestions yet.</div>
+          </div>
+          <p class="caution-note">These are heuristic suggestions, not proof of what your assignment requires. Confirm them against the brief.</p>
+        </article>
+
+        <article class="card">
+          <div class="card-header">
+            <div>
+              <p class="section-kicker">6 · DO THESE FIRST</p>
+              <h2>Recommended starting checklist</h2>
+            </div>
+          </div>
+          <div id="actionChecklist" class="action-checklist empty-state">No recommendations yet.</div>
+        </article>
+      </section>
+
+      <section class="card preview-card">
+        <div class="card-header">
+          <div>
+            <p class="section-kicker">DATA PREVIEW</p>
+            <h2>First rows</h2>
+          </div>
+          <span id="previewMeta" class="save-status">—</span>
+        </div>
+        <div class="table-wrap preview-wrap">
+          <table id="previewTable" class="preview-table">
+            <tbody><tr><td class="empty-cell">No preview available.</td></tr></tbody>
+          </table>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+  <script src="preflight.js"></script>
+</body>
+</html>
