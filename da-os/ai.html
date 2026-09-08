@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="DA.OS V1.0 optional AI reasoning settings." />
+  <title>AI Reasoning — DA.OS</title>
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="ai.css" />
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar">
+      <div class="brand"><div class="brand-mark">DA</div><div><strong>DA.OS</strong><span>AI Reasoning</span></div></div>
+      <nav class="nav" aria-label="AI Reasoning navigation">
+        <a class="nav-item" href="index.html" style="text-decoration:none;display:block;">← Workspace</a>
+        <a class="nav-item" href="router.html" style="text-decoration:none;display:block;">I'm stuck</a>
+        <a class="nav-item" href="adapter.html" style="text-decoration:none;display:block;">Assignment Adapter</a>
+        <a class="nav-item active" href="ai.html" style="text-decoration:none;display:block;">AI Reasoning</a>
+      </nav>
+      <div class="sidebar-footer"><p>V1.0 rule</p><strong>AI suggests. Deterministic checks decide.</strong></div>
+    </aside>
+
+    <main class="main ai-main">
+      <header class="topbar">
+        <div><p class="eyebrow">DA.OS V1.0 · OPTIONAL AI REASONING</p><h1>Add semantic reasoning without surrendering control.</h1></div>
+        <div class="topbar-actions"><button id="testBtn" class="button button-primary">Test connection</button><a href="index.html" class="button button-ghost" style="text-decoration:none;">Back to project</a></div>
+      </header>
+
+      <section class="card ai-hero">
+        <div><p class="section-kicker">ARCHITECTURE</p><h2>Deterministic first. AI only where ambiguity actually matters.</h2><p>V1.0 can semantically review unusual assignment briefs and reconsider low-confidence routing. It cannot silently remove requirements, mark evidence verified, or override the Submission Gate.</p></div>
+        <div id="statusCard" class="ai-status neutral"><span>AI STATUS</span><strong id="statusText">Not checked</strong><small id="modelText">Deterministic DA.OS remains available.</small></div>
+      </section>
+
+      <section class="ai-grid">
+        <article class="card">
+          <div class="card-header"><div><p class="section-kicker">1 · ENABLE</p><h2>Optional reasoning layer</h2></div></div>
+          <label class="toggle-row"><input id="enabled" type="checkbox" /><span><strong>Enable AI reasoning</strong><small>When disabled, DA.OS behaves exactly like V0.9.</small></span></label>
+          <label>Reasoning endpoint<input id="endpoint" type="text" value="/api/reason" /></label>
+          <small class="field-help">Use the included <code>server.py</code> for a same-origin local endpoint. No API key is entered here.</small>
+          <div class="action-row"><button id="saveBtn" class="button button-primary">Save settings</button><button id="resetBtn" class="button button-ghost">Reset defaults</button></div>
+        </article>
+
+        <article class="card">
+          <div class="card-header"><div><p class="section-kicker">2 · SECURITY BOUNDARY</p><h2>What stays out of the browser</h2></div></div>
+          <div class="boundary-list">
+            <div><strong>API key</strong><span>Server environment only</span></div>
+            <div><strong>Model selection</strong><span>Server environment</span></div>
+            <div><strong>Raw dataset rows</strong><span>Not sent by V1.0 reasoning</span></div>
+            <div><strong>Evidence file bytes</strong><span>Not sent by V1.0 reasoning</span></div>
+            <div><strong>AI output</strong><span>Suggestions only until you explicitly apply them</span></div>
+          </div>
+        </article>
+      </section>
+
+      <section class="card capabilities-card">
+        <div class="card-header"><div><p class="section-kicker">3 · WHAT AI CAN DO</p><h2>Semantic assistance at two high-value choke points</h2></div></div>
+        <div class="capability-grid">
+          <div><span>ASSIGNMENT ADAPTER</span><strong>Semantic review</strong><p>Find likely omissions, subtle constraints, unclear wording and useful task additions after the deterministic plan already exists.</p><a href="adapter.html">Open Adapter →</a></div>
+          <div><span>I'M STUCK ROUTER</span><strong>Low-confidence reconsideration</strong><p>When deterministic routing is ambiguous, ask AI to recommend one existing DA.OS workflow without solving the assignment itself.</p><a href="router.html">Open Router →</a></div>
+          <div><span>NOT ALLOWED</span><strong>No silent authority</strong><p>AI does not invent rubric weights, verify evidence, decide that data issues are acceptable, or convert a WARN/BLOCK into PASS.</p></div>
+        </div>
+      </section>
+
+      <section class="card setup-card">
+        <div><p class="section-kicker">LOCAL SETUP</p><h2>Run V1.0 securely</h2><pre><code>cd da-os
+export AI_GATEWAY_API_KEY="your_gateway_key"
+# optional: export DAOS_AI_MODEL="openai/gpt-5.6-sol"
+python3 server.py</code></pre><p>Then open <code>http://127.0.0.1:8000/ai.html</code>, enable AI reasoning, and test the connection.</p></div>
+      </section>
+    </main>
+  </div>
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  <script src="ai-client.js"></script>
+  <script src="ai.js"></script>
+</body>
+</html>
