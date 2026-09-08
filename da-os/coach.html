@@ -11,146 +11,24 @@
 <body>
   <div class="app-shell">
     <aside class="sidebar">
-      <div class="brand">
-        <div class="brand-mark">DA</div>
-        <div>
-          <strong>DA.OS</strong>
-          <span>Learning Coach</span>
-        </div>
-      </div>
-
-      <nav class="nav" aria-label="Coach navigation">
-        <a class="nav-item" href="index.html" style="text-decoration:none;display:block;">← Workspace</a>
-        <a class="nav-item active" href="coach.html" style="text-decoration:none;display:block;">Learning Coach</a>
-        <a class="nav-item" href="doctor.html" style="text-decoration:none;display:block;">Error Doctor</a>
-        <a class="nav-item" href="memory.html" style="text-decoration:none;display:block;">Feedback Memory</a>
-      </nav>
-
-      <div class="sidebar-footer coach-sidebar-footer">
-        <p>Coach principle</p>
-        <strong>Think first. Hint second. Example last.</strong>
-      </div>
+      <div class="brand"><div class="brand-mark">DA</div><div><strong>DA.OS</strong><span>Learning Coach</span></div></div>
+      <nav class="nav" aria-label="Coach navigation"><a class="nav-item" href="index.html" style="text-decoration:none;display:block;">← Workspace</a><a class="nav-item" href="router.html" style="text-decoration:none;display:block;">I'm Stuck</a><a class="nav-item active" href="coach.html" style="text-decoration:none;display:block;">Learning Coach</a><a class="nav-item" href="doctor.html" style="text-decoration:none;display:block;">Error Doctor</a><a class="nav-item" href="memory.html" style="text-decoration:none;display:block;">Feedback Memory</a></nav>
+      <div class="sidebar-footer coach-sidebar-footer"><p>Coach principle</p><strong>Think first. Hint second. Example last.</strong></div>
     </aside>
-
     <main class="main coach-main">
-      <header class="topbar coach-topbar">
-        <div>
-          <p class="eyebrow">DA.OS V0.4 · LEARNING COACH</p>
-          <h1 id="coachHeading">Learn the next step, don't outsource it.</h1>
-        </div>
-        <div class="topbar-actions">
-          <a href="memory.html" class="button button-ghost" style="text-decoration:none;">Past feedback</a>
-          <a href="doctor.html" class="button button-ghost" style="text-decoration:none;">Something broke</a>
-          <a href="index.html" class="button button-ghost" style="text-decoration:none;">Back to project</a>
-        </div>
-      </header>
-
-      <section class="coach-hero card">
-        <div>
-          <p class="section-kicker">CURRENT PROJECT</p>
-          <h2 id="projectName">No project loaded</h2>
-          <p id="projectContext">Create or load a project in DA.OS first.</p>
-        </div>
-        <div class="coach-status">
-          <span>Current task</span>
-          <strong id="currentTask">—</strong>
-          <small id="currentCategory">—</small>
-        </div>
-      </section>
-
+      <header class="topbar coach-topbar"><div><p class="eyebrow">DA.OS V0.4 · LEARNING COACH</p><h1 id="coachHeading">Learn the next step, don't outsource it.</h1></div><div class="topbar-actions"><a href="memory.html" class="button button-ghost" style="text-decoration:none;">Past feedback</a><a href="doctor.html" class="button button-ghost" style="text-decoration:none;">Something broke</a><a href="index.html" class="button button-ghost" style="text-decoration:none;">Back to project</a></div></header>
+      <section class="coach-hero card"><div><p class="section-kicker">CURRENT PROJECT</p><h2 id="projectName">No project loaded</h2><p id="projectContext">Create or load a project in DA.OS first.</p></div><div class="coach-status"><span>Current task</span><strong id="currentTask">—</strong><small id="currentCategory">—</small></div></section>
       <section class="coach-grid">
-        <article class="card coach-panel">
-          <div class="card-header">
-            <div>
-              <p class="section-kicker">1 · CHOOSE YOUR TOOL</p>
-              <h2>What are you working in?</h2>
-            </div>
-          </div>
-          <div id="coachTools" class="tool-tabs" role="tablist" aria-label="Learning tool">
-            <button class="tool-tab" data-tool="Excel">Excel</button>
-            <button class="tool-tab" data-tool="SQL">SQL</button>
-            <button class="tool-tab" data-tool="Python">Python</button>
-            <button class="tool-tab" data-tool="Power BI">Power BI</button>
-            <button class="tool-tab" data-tool="Tableau">Tableau</button>
-          </div>
-          <p class="tool-note" id="toolNote">DA.OS will tailor the explanation to the tool you choose.</p>
-        </article>
-
-        <article class="card coach-panel">
-          <div class="card-header">
-            <div>
-              <p class="section-kicker">2 · LEARNING GOAL</p>
-              <h2 id="lessonTitle">Start with the reasoning</h2>
-            </div>
-            <span id="lessonLevel" class="counter">1/4</span>
-          </div>
-
-          <div class="lesson-core">
-            <p class="lesson-question" id="lessonQuestion">Load a project to begin coaching.</p>
-            <div class="concept-box">
-              <span>CONCEPT TO UNDERSTAND</span>
-              <p id="lessonConcept">The coach will explain the concept behind your current NEXT task.</p>
-            </div>
-          </div>
-
-          <div id="hintArea" class="hint-area"></div>
-
-          <div class="coach-actions">
-            <button id="hintBtn" class="button button-primary">Reveal first hint</button>
-            <button id="resetHintsBtn" class="button button-ghost">Reset hints</button>
-          </div>
-          <p class="coach-rule">Examples are deliberately hidden until the final hint so you attempt the reasoning first.</p>
-        </article>
-
-        <article class="card coach-panel scratch-panel">
-          <div class="card-header">
-            <div>
-              <p class="section-kicker">3 · YOUR THINKING</p>
-              <h2>Work it out here</h2>
-            </div>
-            <span id="scratchStatus" class="save-status">Saved locally</span>
-          </div>
-          <textarea id="scratchpad" rows="12" placeholder="Write your reasoning, formula idea, SQL structure, questions, or what you think the answer should be..."></textarea>
-          <div class="scratch-prompts">
-            <button class="prompt-chip" data-prompt="What is the business question I am trying to answer?">Business question</button>
-            <button class="prompt-chip" data-prompt="What is my numerator and denominator?">Numerator / denominator</button>
-            <button class="prompt-chip" data-prompt="What is the grain of the data at this step?">Data grain</button>
-            <button class="prompt-chip" data-prompt="How will I validate that this result is correct?">Validation</button>
-          </div>
-        </article>
-
-        <article class="card coach-panel self-check-panel">
-          <div class="card-header">
-            <div>
-              <p class="section-kicker">4 · SELF-CHECK</p>
-              <h2>Can you explain what you're doing?</h2>
-            </div>
-            <span id="checkScore" class="counter">0/4</span>
-          </div>
-          <div id="checklist" class="learning-checklist"></div>
-          <div class="understanding-actions">
-            <button id="needsReviewBtn" class="button button-ghost">I need to review this</button>
-            <button id="understoodBtn" class="button button-primary">I understand this step</button>
-          </div>
-          <div id="understandingMessage" class="understanding-message" aria-live="polite"></div>
-        </article>
+        <article class="card coach-panel"><div class="card-header"><div><p class="section-kicker">1 · CHOOSE YOUR TOOL</p><h2>What are you working in?</h2></div></div><div id="coachTools" class="tool-tabs" role="tablist" aria-label="Learning tool"><button class="tool-tab" data-tool="Excel">Excel</button><button class="tool-tab" data-tool="SQL">SQL</button><button class="tool-tab" data-tool="Python">Python</button><button class="tool-tab" data-tool="Power BI">Power BI</button><button class="tool-tab" data-tool="Tableau">Tableau</button></div><p class="tool-note" id="toolNote">DA.OS will tailor the explanation to the tool you choose.</p></article>
+        <article class="card coach-panel"><div class="card-header"><div><p class="section-kicker">2 · LEARNING GOAL</p><h2 id="lessonTitle">Start with the reasoning</h2></div><span id="lessonLevel" class="counter">1/4</span></div><div class="lesson-core"><p class="lesson-question" id="lessonQuestion">Load a project to begin coaching.</p><div class="concept-box"><span>CONCEPT TO UNDERSTAND</span><p id="lessonConcept">The coach will explain the concept behind your current NEXT task.</p></div></div><div id="hintArea" class="hint-area"></div><div class="coach-actions"><button id="hintBtn" class="button button-primary">Reveal first hint</button><button id="resetHintsBtn" class="button button-ghost">Reset hints</button></div><p class="coach-rule">Examples are deliberately hidden until the final hint so you attempt the reasoning first.</p></article>
+        <article class="card coach-panel scratch-panel"><div class="card-header"><div><p class="section-kicker">3 · YOUR THINKING</p><h2>Work it out here</h2></div><span id="scratchStatus" class="save-status">Saved locally</span></div><textarea id="scratchpad" rows="12" placeholder="Write your reasoning, formula idea, SQL structure, questions, or what you think the answer should be..."></textarea><div class="scratch-prompts"><button class="prompt-chip" data-prompt="What is the business question I am trying to answer?">Business question</button><button class="prompt-chip" data-prompt="What is my numerator and denominator?">Numerator / denominator</button><button class="prompt-chip" data-prompt="What is the grain of the data at this step?">Data grain</button><button class="prompt-chip" data-prompt="How will I validate that this result is correct?">Validation</button></div></article>
+        <article class="card coach-panel self-check-panel"><div class="card-header"><div><p class="section-kicker">4 · SELF-CHECK</p><h2>Can you explain what you're doing?</h2></div><span id="checkScore" class="counter">0/4</span></div><div id="checklist" class="learning-checklist"></div><div class="understanding-actions"><button id="needsReviewBtn" class="button button-ghost">I need to review this</button><button id="understoodBtn" class="button button-primary">I understand this step</button></div><div id="understandingMessage" class="understanding-message" aria-live="polite"></div></article>
       </section>
-
-      <section class="card coach-footer-card">
-        <div>
-          <p class="section-kicker">LEARNING RECORD</p>
-          <h2>What DA.OS remembers</h2>
-          <p>The coach saves your scratchpad, hint progress, and whether this task needs review or feels understood. Error Doctor remembers debugging patterns, while Feedback Memory turns instructor corrections into reusable rules. Everything remains in your browser in V0.4.</p>
-        </div>
-        <div class="learning-stats">
-          <div><strong id="understoodCount">0</strong><span>understood</span></div>
-          <div><strong id="reviewCount">0</strong><span>needs review</span></div>
-        </div>
-      </section>
+      <section class="card coach-footer-card"><div><p class="section-kicker">LEARNING RECORD</p><h2>What DA.OS remembers</h2><p>The coach saves your scratchpad, hint progress, and whether this task needs review or feels understood. Error Doctor remembers debugging patterns, while Feedback Memory turns instructor corrections into reusable rules.</p></div><div class="learning-stats"><div><strong id="understoodCount">0</strong><span>understood</span></div><div><strong id="reviewCount">0</strong><span>needs review</span></div></div></section>
     </main>
   </div>
-
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
   <script src="coach.js"></script>
+  <script src="stuck-launcher.js"></script>
 </body>
 </html>
