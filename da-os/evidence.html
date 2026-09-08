@@ -14,6 +14,7 @@
       <div class="brand"><div class="brand-mark">DA</div><div><strong>DA.OS</strong><span>Rubric + Evidence</span></div></div>
       <nav class="nav" aria-label="Evidence navigation">
         <a class="nav-item" href="index.html" style="text-decoration:none;display:block;">← Workspace</a>
+        <a class="nav-item" href="router.html" style="text-decoration:none;display:block;">I'm Stuck</a>
         <a class="nav-item" href="adapter.html" style="text-decoration:none;display:block;">Assignment Adapter</a>
         <a class="nav-item active" href="evidence.html" style="text-decoration:none;display:block;">Rubric + Evidence</a>
         <a class="nav-item" href="preflight.html" style="text-decoration:none;display:block;">Dataset Preflight</a>
@@ -24,56 +25,18 @@
       </nav>
       <div class="sidebar-footer"><p>Evidence rule</p><strong>Done is not the same as proven.</strong></div>
     </aside>
-
     <main class="main evidence-main">
-      <header class="topbar">
-        <div><p class="eyebrow">DA.OS V0.7 · RUBRIC + EVIDENCE ENGINE</p><h1>Know exactly what you can prove.</h1></div>
-        <div class="topbar-actions"><button id="exportBtn" class="button button-ghost">Export evidence map</button><button id="syncBtn" class="button button-primary">Sync from assignment</button><a href="submission.html" class="button button-ghost" style="text-decoration:none;">Run Submission Gate</a><a href="index.html#next" class="button button-ghost" style="text-decoration:none;">Back to NEXT</a></div>
-      </header>
-
-      <section class="card evidence-hero">
-        <div><p class="section-kicker">CURRENT PROJECT</p><h2 id="projectName">No project loaded</h2><p id="projectContext">Use Universal Assignment Adapter first so DA.OS can map requirements and rubric criteria.</p><div id="syncWarning" class="sync-warning hidden"></div></div>
-        <div class="coverage-summary"><div class="coverage-ring" aria-label="verified requirement coverage"><strong id="coveragePct">0%</strong><span>verified</span></div><div class="coverage-copy"><strong id="coverageLine">0 of 0 criteria verified</strong><span id="weightedCoverage">No weighted rubric detected</span></div></div>
-      </section>
-
-      <section class="summary-grid">
-        <article class="card metric-card"><span>CRITERIA</span><strong id="criteriaCount">0</strong><small>deliverables + constraints + rubric</small></article>
-        <article class="card metric-card"><span>MISSING</span><strong id="missingCount">0</strong><small>no evidence linked</small></article>
-        <article class="card metric-card"><span>EVIDENCE ADDED</span><strong id="evidenceLinkedCount">0</strong><small>proof exists, not verified</small></article>
-        <article class="card metric-card"><span>VERIFIED</span><strong id="verifiedCount">0</strong><small>checked against criterion</small></article>
-      </section>
-
-      <section class="evidence-layout">
-        <article class="card criteria-card">
-          <div class="card-header"><div><p class="section-kicker">1 · COVERAGE MATRIX</p><h2>Requirements and rubric criteria</h2><p class="card-copy">DA.OS does not estimate your grade. It tracks whether every explicit requirement has actual evidence and whether you personally verified that evidence.</p></div><div class="matrix-controls"><select id="criterionFilter" aria-label="Filter criteria"><option value="all">All criteria</option><option value="missing">Missing evidence</option><option value="linked">Evidence added</option><option value="verified">Verified</option><option value="rubric">Rubric only</option><option value="deliverable">Deliverables only</option><option value="constraint">Constraints only</option></select><input id="criterionSearch" type="text" placeholder="Search criteria" /></div></div>
-          <div id="criteriaList" class="criteria-list empty-state">No assignment criteria loaded.</div>
-        </article>
-        <aside class="card gaps-card"><div class="card-header"><div><p class="section-kicker">GAPS</p><h2>What still needs proof?</h2></div></div><div id="gapsList" class="gaps-list empty-state">Missing requirements will appear here.</div></aside>
-      </section>
-
-      <section class="card add-evidence-card">
-        <div class="card-header"><div><p class="section-kicker">2 · ADD ACTUAL EVIDENCE</p><h2>Point DA.OS to the artifact that proves the work.</h2><p class="card-copy">Evidence can be a workbook, SQL query, notebook, dashboard, chart, slide, calculation, screenshot, written explanation, or any other artifact your assignment requires.</p></div><span id="saveStatus" class="save-status">Saved locally</span></div>
-        <div class="evidence-form-grid">
-          <label>Evidence type<select id="evidenceType"><option>File / artifact</option><option>Calculation / metric</option><option>SQL query</option><option>Python / notebook output</option><option>Chart / visual</option><option>Dashboard</option><option>Slide / presentation</option><option>Screenshot</option><option>Written explanation</option><option>Validation check</option><option>Other</option></select></label>
-          <label>Evidence title<input id="evidenceTitle" type="text" placeholder="e.g. Churn rate DAX measure" /></label>
-          <label>Reference / location<input id="evidenceReference" type="text" placeholder="e.g. dashboard.pbix · KPI card / Sheet1!PivotTable2 / query_03.sql" /></label>
-          <label>Optional local file<input id="evidenceFile" type="file" /></label>
-        </div>
-        <label>Notes — what does this prove?<textarea id="evidenceNotes" rows="5" placeholder="Explain the exact result, requirement, number, chart, or calculation this evidence supports. Do not just write ‘done’." ></textarea></label>
-        <fieldset class="criterion-picker"><legend>Link this evidence to one or more criteria</legend><div id="criterionPicker" class="criterion-picker-list empty-state">Sync assignment criteria first.</div></fieldset>
-        <label class="verify-check"><input id="verifiedNow" type="checkbox" /><span><strong>I checked this evidence against the linked criterion(s).</strong><small>Only check this after you inspected the actual output and confirmed it satisfies the wording/validation requirement.</small></span></label>
-        <div class="action-row"><button id="addEvidenceBtn" class="button button-primary">Save evidence</button><button id="clearEvidenceBtn" class="button button-ghost">Clear form</button><a href="submission.html" class="button button-ghost" style="text-decoration:none;">Run final gate</a></div>
-      </section>
-
-      <section class="card evidence-register-card">
-        <div class="card-header"><div><p class="section-kicker">3 · EVIDENCE REGISTER</p><h2>Everything you can point to.</h2></div><div class="matrix-controls"><select id="evidenceFilter"><option value="all">All evidence</option><option value="verified">Verified</option><option value="unverified">Needs verification</option></select><input id="evidenceSearch" type="text" placeholder="Search evidence" /></div></div>
-        <div id="evidenceList" class="evidence-register empty-state">No evidence saved yet.</div>
-      </section>
-
+      <header class="topbar"><div><p class="eyebrow">DA.OS V0.7 · RUBRIC + EVIDENCE ENGINE</p><h1>Know exactly what you can prove.</h1></div><div class="topbar-actions"><button id="exportBtn" class="button button-ghost">Export evidence map</button><button id="syncBtn" class="button button-primary">Sync from assignment</button><a href="submission.html" class="button button-ghost" style="text-decoration:none;">Run Submission Gate</a><a href="index.html#next" class="button button-ghost" style="text-decoration:none;">Back to NEXT</a></div></header>
+      <section class="card evidence-hero"><div><p class="section-kicker">CURRENT PROJECT</p><h2 id="projectName">No project loaded</h2><p id="projectContext">Use Universal Assignment Adapter first so DA.OS can map requirements and rubric criteria.</p><div id="syncWarning" class="sync-warning hidden"></div></div><div class="coverage-summary"><div class="coverage-ring" aria-label="verified requirement coverage"><strong id="coveragePct">0%</strong><span>verified</span></div><div class="coverage-copy"><strong id="coverageLine">0 of 0 criteria verified</strong><span id="weightedCoverage">No weighted rubric detected</span></div></div></section>
+      <section class="summary-grid"><article class="card metric-card"><span>CRITERIA</span><strong id="criteriaCount">0</strong><small>deliverables + constraints + rubric</small></article><article class="card metric-card"><span>MISSING</span><strong id="missingCount">0</strong><small>no evidence linked</small></article><article class="card metric-card"><span>EVIDENCE ADDED</span><strong id="evidenceLinkedCount">0</strong><small>proof exists, not verified</small></article><article class="card metric-card"><span>VERIFIED</span><strong id="verifiedCount">0</strong><small>checked against criterion</small></article></section>
+      <section class="evidence-layout"><article class="card criteria-card"><div class="card-header"><div><p class="section-kicker">1 · COVERAGE MATRIX</p><h2>Requirements and rubric criteria</h2><p class="card-copy">DA.OS does not estimate your grade. It tracks whether every explicit requirement has actual evidence and whether you personally verified that evidence.</p></div><div class="matrix-controls"><select id="criterionFilter" aria-label="Filter criteria"><option value="all">All criteria</option><option value="missing">Missing evidence</option><option value="linked">Evidence added</option><option value="verified">Verified</option><option value="rubric">Rubric only</option><option value="deliverable">Deliverables only</option><option value="constraint">Constraints only</option></select><input id="criterionSearch" type="text" placeholder="Search criteria" /></div></div><div id="criteriaList" class="criteria-list empty-state">No assignment criteria loaded.</div></article><aside class="card gaps-card"><div class="card-header"><div><p class="section-kicker">GAPS</p><h2>What still needs proof?</h2></div></div><div id="gapsList" class="gaps-list empty-state">Missing requirements will appear here.</div></aside></section>
+      <section class="card add-evidence-card"><div class="card-header"><div><p class="section-kicker">2 · ADD ACTUAL EVIDENCE</p><h2>Point DA.OS to the artifact that proves the work.</h2><p class="card-copy">Evidence can be a workbook, SQL query, notebook, dashboard, chart, slide, calculation, screenshot, written explanation, or any other artifact your assignment requires.</p></div><span id="saveStatus" class="save-status">Saved locally</span></div><div class="evidence-form-grid"><label>Evidence type<select id="evidenceType"><option>File / artifact</option><option>Calculation / metric</option><option>SQL query</option><option>Python / notebook output</option><option>Chart / visual</option><option>Dashboard</option><option>Slide / presentation</option><option>Screenshot</option><option>Written explanation</option><option>Validation check</option><option>Other</option></select></label><label>Evidence title<input id="evidenceTitle" type="text" placeholder="e.g. Churn rate DAX measure" /></label><label>Reference / location<input id="evidenceReference" type="text" placeholder="e.g. dashboard.pbix · KPI card / Sheet1!PivotTable2 / query_03.sql" /></label><label>Optional local file<input id="evidenceFile" type="file" /></label></div><label>Notes — what does this prove?<textarea id="evidenceNotes" rows="5" placeholder="Explain the exact result, requirement, number, chart, or calculation this evidence supports. Do not just write ‘done’." ></textarea></label><fieldset class="criterion-picker"><legend>Link this evidence to one or more criteria</legend><div id="criterionPicker" class="criterion-picker-list empty-state">Sync assignment criteria first.</div></fieldset><label class="verify-check"><input id="verifiedNow" type="checkbox" /><span><strong>I checked this evidence against the linked criterion(s).</strong><small>Only check this after you inspected the actual output and confirmed it satisfies the wording/validation requirement.</small></span></label><div class="action-row"><button id="addEvidenceBtn" class="button button-primary">Save evidence</button><button id="clearEvidenceBtn" class="button button-ghost">Clear form</button><a href="submission.html" class="button button-ghost" style="text-decoration:none;">Run final gate</a></div></section>
+      <section class="card evidence-register-card"><div class="card-header"><div><p class="section-kicker">3 · EVIDENCE REGISTER</p><h2>Everything you can point to.</h2></div><div class="matrix-controls"><select id="evidenceFilter"><option value="all">All evidence</option><option value="verified">Verified</option><option value="unverified">Needs verification</option></select><input id="evidenceSearch" type="text" placeholder="Search evidence" /></div></div><div id="evidenceList" class="evidence-register empty-state">No evidence saved yet.</div></section>
       <section class="card task-evidence-card"><div class="card-header"><div><p class="section-kicker">4 · TASK PROOF PLAN</p><h2>What each workflow step expects you to retain.</h2><p class="card-copy">These come from V0.6. They are not automatically marked complete just because the NEXT task is checked off.</p></div></div><div id="taskProofList" class="task-proof-list empty-state">No task proof plan available.</div></section>
     </main>
   </div>
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
   <script src="evidence.js"></script>
+  <script src="stuck-launcher.js"></script>
 </body>
 </html>
