@@ -1,1 +1,7 @@
-# DA.OS is client-side only
+# DA.OS local-only files
+*.local.json
+.env
+.env.*
+!.env.example
+__pycache__/
+*.pyc
