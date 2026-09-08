@@ -1,146 +1,146 @@
-# DA.OS V0.9 — Data Analyst Bootcamp OS
+# DA.OS V1.0 — Data Analyst Bootcamp OS
 
-DA.OS is a local-first operating system for intensive data-analytics coursework. It is designed around one requirement: **whatever assignment the learner receives, the system should help interpret it, execute it, retain proof, learn from mistakes, and stop avoidable submission errors.**
+DA.OS is a local-first operating system for intensive data-analytics coursework. Its requirement is simple: **whatever assignment the learner receives, the system should help interpret it, execute it, retain proof, learn from mistakes, and stop avoidable submission errors.**
 
-## V0.9 flow
+V1.0 keeps the deterministic V0.9 system intact and adds an **optional semantic AI reasoning layer** at two ambiguity-heavy points: Assignment Adapter review and Unified Router reconsideration.
 
-```text
-I'M STUCK
-   ↓
-Unified Router
-   ↓
-Assignment Adapter / Dataset Preflight / NEXT / Learning Coach
-Error Doctor / Feedback Memory / Rubric + Evidence / Submission Gate
-   ↓
-Return to the same project state
-```
-
-The normal end-to-end assignment flow remains:
+## V1.0 architecture
 
 ```text
-ANY ASSIGNMENT
-      ↓
-Universal Assignment Adapter
-      ↓
-Deliverables + constraints + rubric + work type
-      ↓
-Task graph with evidence + validation expectations
-      ↓
-NEXT
-      ↓
-Dataset Preflight / Learning Coach / Error Doctor
-      ↓
-Rubric + Evidence Engine
-      ↓
-Feedback Memory
-      ↓
-Submission Gate
-      ↓
-PASS / WARN / BLOCK
+                      ┌──────────────────────────────┐
+ANY ASSIGNMENT ──────▶│ DETERMINISTIC DA.OS CORE    │
+                      │ Adapter / NEXT / Preflight  │
+                      │ Coach / Doctor / Evidence   │
+                      │ Memory / Submission Gate    │
+                      └──────────────┬───────────────┘
+                                     │
+                          optional semantic review
+                                     │
+                      ┌──────────────▼───────────────┐
+                      │ V1.0 AI REASONING LAYER     │
+                      │ suggestions only            │
+                      └──────────────┬───────────────┘
+                                     │
+                      explicit learner review/apply
+                                     │
+                      ┌──────────────▼───────────────┐
+                      │ deterministic state + QA     │
+                      └──────────────────────────────┘
 ```
 
-## V0.9 Unified “I'm Stuck” Router
+AI never becomes the authority for rubric coverage, evidence verification, data-quality acceptance, or PASS/WARN/BLOCK status.
 
-V0.9 removes the requirement that the learner must know which DA.OS module to open.
+## V1.0 optional AI reasoning
 
-Describe the blockage in normal language, for example:
-- “I don't understand what this assignment wants me to deliver.”
-- “I have a new dataset and don't know what to inspect first.”
-- “My SQL total doubled after a join.”
-- “I know the task but don't know how to do it in Power BI.”
-- “My instructor said my recommendations are just observations.”
-- “I finished everything. Am I safe to submit?”
+### 1. Semantic Assignment Review
+After the normal Universal Assignment Adapter builds a deterministic plan, V1.0 can ask an AI model to look for likely omissions that keyword/rule logic may miss.
 
-The router scores the description against transparent routing rules and combines those signals with the current DA.OS state:
-- whether a project is loaded
-- current NEXT task
-- number of unfinished tasks
-- whether Dataset Preflight exists
-- evidence-register size
-- active feedback rules
-- whether Submission Gate has been run before
+AI may suggest:
+- additional deliverables that appear explicitly implied by the brief
+- additional constraints that appear present but were not captured
+- ambiguities that should be clarified
+- additional workflow tasks
+- review-only improvements to existing tasks
+- cautions about interpretation
 
-Possible destinations:
-- **Universal Assignment Adapter** — unclear brief, deliverables, rubric, grading criteria, scope
-- **Dataset Preflight** — new/unknown data, missing values, duplicates, types, outliers, data-quality questions
-- **Error Doctor** — exact errors, wrong totals/results, broken formulas, tracebacks, join fan-out, runtime failures
-- **Learning Coach** — knows the task but needs to learn how to perform it
-- **Rubric + Evidence** — proving completion, coverage gaps, rubric/criterion evidence
-- **Feedback Memory** — instructor/reviewer correction, mistake, reusable lesson
-- **Submission Gate** — final readiness, finished work, before hand-in
-- **NEXT** — assignment is understood; learner mainly needs the next action
+Safe-merge rules:
+- AI cannot remove deterministic deliverables, constraints, rubric lines or tasks
+- AI cannot invent rubric weights
+- AI additions require an explicit **Apply safe additions** action
+- task revisions remain review-only and are not silently applied
+- applied additions retain AI provenance in the project plan
+- the learner must still review the resulting plan before committing it to DA.OS
 
-The router shows:
-- recommended destination
-- routing confidence
-- matched signals
-- next action
-- up to three alternatives
-- recent routing history
+### 2. Semantic Router Reconsideration
+The V0.9 Unified Router still runs first using transparent text and project-state scoring.
 
-It stores the most recent handoff under `daos-v0.9-route-context` so the route is traceable. Routing history is stored under `daos-v0.9-router`.
+After a deterministic route exists, V1.0 can optionally ask AI to reconsider the blockage. The AI must choose only one existing DA.OS route:
+- Assignment Adapter
+- Dataset Preflight
+- NEXT
+- Learning Coach
+- Error Doctor
+- Rubric + Evidence
+- Feedback Memory
+- Submission Gate
 
-A reusable **I'm stuck** launcher is also available from the major DA.OS modules so routing is accessible without returning to the homepage.
+The AI recommendation appears **alongside** the deterministic route. The learner can open either one. AI never silently replaces the deterministic result.
 
-## Current modules
+### 3. Secure server-side proxy
+The browser never stores an AI provider key.
 
-### Project Workspace + NEXT
-- project name, deadline, tool selection and assignment brief
-- local file metadata
-- execution checklist and progress
-- first unfinished task shown as the next best action
-- direct routes into the specialist modules
+`server.py`:
+- serves the existing static DA.OS files
+- exposes `GET /api/health`
+- exposes `POST /api/reason`
+- reads `AI_GATEWAY_API_KEY` from the server environment
+- reads optional `DAOS_AI_MODEL` from the server environment
+- sends only the requested reasoning payload to the configured Vercel AI Gateway endpoint
+- does not log prompt bodies or keys
+- validates that the model returns JSON before passing a result to the browser
 
-### Universal Assignment Adapter
-Accepts pasted instructions/rubrics or locally extracts supported text from PDF, DOCX, TXT, Markdown, SQL, Python, Jupyter notebooks, JSON and CSV.
-
-It detects likely work types including data cleaning, EDA, Excel, SQL, Python/pandas, statistics, Power BI, Tableau, dashboard work, presentations, business cases and capstones. It extracts deliverables, constraints, grading signals, required tools and ambiguities, then generates a task graph.
-
-Each generated task includes what to do, why it matters, what evidence to retain, and how to validate the result.
-
-### Dataset Preflight
-Profiles CSV/XLS/XLSX data locally for rows/columns, duplicates, missingness, inferred types, cardinality, numeric ranges, summary statistics, IQR outliers, date ranges, and likely identifiers/measures/dimensions/targets. Raw rows are not persisted in localStorage.
-
-### Learning Coach
-Supports Excel, SQL, Python, Power BI and Tableau using a reasoning → structure → validation → worked-pattern hint ladder.
-
-### Error Doctor
-Guided Excel / SQL / Python debugging that reveals diagnostic tests before the fix and preserves repeated debugging patterns.
-
-### Feedback Memory
-Stores instructor/self/peer corrections as reusable Blocker / Warning / Tip rules that can reappear in later project context.
-
-### Rubric + Evidence Engine
-Builds a live coverage matrix from Adapter deliverables, constraints and rubric lines (or project requirements as a fallback).
-
-Each criterion moves through:
+Default model configuration in this branch:
 
 ```text
-MISSING → EVIDENCE ADDED → VERIFIED
+openai/gpt-5.6-sol
 ```
 
-Coverage metrics are **evidence coverage, not grade predictions**.
+The model can be changed without browser code by setting `DAOS_AI_MODEL`.
 
-### Submission Gate
-Returns **BLOCK / WARN / PASS** using project state, evidence coverage, Dataset Preflight, Feedback Memory and explicit final manual checks. A PASS is a completeness/QA signal, not a grade guarantee.
+### 4. AI settings page
+`/ai.html` controls only:
+- whether optional AI reasoning is enabled in this browser
+- which same-origin/custom reasoning endpoint the browser should call
+- connection/health testing
 
-## Quick start
+No API-key field exists in the browser UI.
 
-No build step is required.
+Storage:
+- `daos-v1-ai-settings` — enabled flag + endpoint only
+- router AI review is stored inside the existing latest route context when used
+
+## Quick start — deterministic only
+
+All non-AI DA.OS features continue to work with a normal static server:
 
 ```bash
 cd da-os
 python3 -m http.server 8000
 ```
 
-Then open `http://localhost:8000`.
+Then open:
 
-Main pages:
+```text
+http://127.0.0.1:8000
+```
+
+AI reasoning will simply remain unavailable.
+
+## Quick start — V1.0 AI enabled
+
+```bash
+cd da-os
+export AI_GATEWAY_API_KEY="your_gateway_key"
+# optional override:
+export DAOS_AI_MODEL="openai/gpt-5.6-sol"
+python3 server.py
+```
+
+Then:
+1. Open `http://127.0.0.1:8000/ai.html`
+2. Enable AI reasoning
+3. Test the connection
+4. Use **Run semantic review** inside Assignment Adapter, or **Ask AI to reconsider** inside the Unified Router
+
+Never commit a real key. `da-os/.env.example` contains placeholders only.
+
+## Main pages
 
 ```text
 /index.html       Workspace + quick Deconstructor + NEXT
-/router.html      Unified “I'm stuck” Router
-/adapter.html     Universal Assignment Adapter
+/router.html      Unified “I'm stuck” Router + optional AI reconsideration
+/ai.html          V1.0 AI settings / health
+/adapter.html     Universal Assignment Adapter + optional semantic review
 /evidence.html    Rubric + Evidence Engine
 /preflight.html   Dataset Preflight
 /coach.html       Learning Coach
@@ -149,23 +149,76 @@ Main pages:
 /submission.html  Submission Gate
 ```
 
-## Privacy
+## Existing deterministic modules retained
 
-DA.OS remains local-first.
+### Project Workspace + NEXT
+Tracks project setup, files/metadata, task progress and the first unfinished action.
 
-- project/assignment text is stored in browser localStorage when committed to the project
-- assignment source files are read locally and are not uploaded by DA.OS
-- Dataset Preflight does not persist raw data rows
-- Rubric + Evidence does not persist raw evidence file bytes
-- Submission Gate stores only manual-check state / last-run metadata
-- Unified Router stores only the typed problem description, route metadata/history and current project/task names — not raw assignment/evidence/data files
+### Universal Assignment Adapter
+Parses pasted/extracted briefs and rubrics, detects work types/tools, extracts deliverables/constraints/rubric criteria and builds an evidence-aware task graph.
 
-External browser libraries currently used:
-- SheetJS for XLS/XLSX parsing
-- PDF.js for PDF assignment-text extraction
-- Mammoth.js for DOCX assignment-text extraction
+### Dataset Preflight
+Profiles CSV/XLS/XLSX data locally for shape, duplicates, missingness, inferred types, cardinality, ranges, summary statistics, outliers, dates and likely analytical roles. Raw rows are not persisted.
 
-Storage keys:
+### Learning Coach
+Supports Excel, SQL, Python, Power BI and Tableau using a reasoning → structure → validation → worked-pattern hint ladder.
+
+### Error Doctor
+Guided Excel / SQL / Python debugging that reveals diagnostic tests before the fix and remembers repeated error patterns.
+
+### Feedback Memory
+Turns instructor/self/peer corrections into reusable Blocker / Warning / Tip rules.
+
+### Rubric + Evidence Engine
+Tracks each explicit criterion through:
+
+```text
+MISSING → EVIDENCE ADDED → VERIFIED
+```
+
+Coverage is evidence coverage, **not a grade prediction**.
+
+### Submission Gate
+Returns **BLOCK / WARN / PASS** from available project state, evidence, Dataset Preflight, Feedback Memory and explicit final manual checks. A PASS is a completeness/QA signal, not a grade guarantee.
+
+### Unified Router
+Routes a plain-language blockage to the correct existing DA.OS workflow using transparent text + project-state scoring and shows alternatives when confidence is low.
+
+## Privacy and trust boundaries
+
+DA.OS remains local-first by default.
+
+- project state is browser-local
+- raw dataset rows are not persisted by Dataset Preflight
+- raw evidence file bytes are not persisted
+- assignment source files are parsed locally where supported
+- router history stores only typed blockage text + route metadata
+- AI is disabled by default
+- AI calls occur only after an explicit user action
+- AI provider credentials remain server-side
+- Assignment semantic review sends the assignment brief/rubric and deterministic plan to the configured reasoning backend when invoked
+- Router semantic review sends the blockage text, deterministic route scores and lightweight project-state signals when invoked
+- raw dataset rows and evidence-file bytes are not sent by the V1.0 semantic layer
+
+Prompt-injection boundary:
+- assignment/rubric text is treated as untrusted data by the server system prompt
+- model output must parse as JSON
+- client-side safe merge limits what AI output can modify
+- deterministic evidence/validation rules are never delegated to AI
+
+## CI
+
+V1.0 adds `.github/workflows/daos-ci.yml`.
+
+For DA.OS changes it:
+- compiles `server.py`
+- runs `node --check` on every DA.OS JavaScript file
+- starts the local server without an AI key
+- verifies `/api/health` reports AI disabled rather than failing
+- verifies the main DA.OS page is served
+
+## Storage keys
+
 - `daos-v0.1-state` — shared project state
 - `daos-v0.2-coach` — Learning Coach
 - `daos-v0.3-doctor` — Error Doctor
@@ -174,38 +227,33 @@ Storage keys:
 - `daos-v0.7-evidence` — evidence register + assignment signature
 - `daos-v0.8-submission` — manual final checks + last-run timestamp
 - `daos-v0.9-router` — recent route history
-- `daos-v0.9-route-context` — most recent router handoff
+- `daos-v0.9-route-context` — most recent router handoff (+ optional AI review)
+- `daos-v1-ai-settings` — optional AI enabled flag + endpoint
 
 ## Design principles
 
-1. Describe the blockage, not the module.
-2. Adapt before executing.
-3. Plan from explicit deliverables and constraints.
+1. Deterministic first; AI only where semantic ambiguity adds value.
+2. AI suggests; deterministic checks decide.
+3. Adapt before executing.
 4. Inspect data before analysing.
 5. Reason before revealing answers.
 6. Done is not the same as proven.
 7. Evidence added is not the same as verified.
 8. A polished output can still be wrong.
-9. Do not hide uncertainty behind a fake score.
+9. Never hide uncertainty behind a fake grade or confidence score.
 10. Keep raw files/data local and transient where possible.
 11. Make the learner more independent over time.
 
-## Next planned module
-
-### V1.0 — Optional AI reasoning layer
-Use AI for ambiguous/unusual briefs and semantic interpretation while retaining deterministic routing, state, evidence, validation and privacy-oriented fallbacks.
-
-Portfolio mode remains later, after real GA projects exist.
-
 ## Current limitations
 
-- V0.9 routing is transparent rule/state scoring rather than semantic AI reasoning; ambiguous wording can produce low-confidence routes
-- assignment classification is deterministic pattern/rule analysis rather than semantic AI reasoning
-- rubric extraction understands visible/simple criteria and weights, not hidden instructor expectations
-- Rubric + Evidence does not inspect raw linked evidence file contents
+- V1.0 does not provide AI chat everywhere; it intentionally limits AI to assignment semantics and ambiguous routing
+- semantic review quality still depends on the configured model
+- AI may suggest something that sounds plausible but is not actually required; safe additions must still be checked against the original brief
+- AI cannot inspect hidden instructor expectations
+- Rubric + Evidence does not inspect raw linked evidence contents
 - Submission Gate cannot independently execute SQL, Excel formulas, Python notebooks, Power BI interactions or Tableau workbooks
-- Dataset Preflight flags possible issues; it does not prove that an outlier or missing value is wrong
-- PDF extraction requires selectable text; scanned PDFs need OCR or pasted text
-- PPTX instruction extraction and screenshot OCR are not yet supported
+- Dataset Preflight flags possible issues; it does not prove an outlier/missing value is wrong
+- scanned PDFs still require OCR/manual text
+- PPTX instruction extraction and screenshot OCR are not yet implemented
 
-These limitations are intentional: DA.OS should remain transparent about what it knows and what still requires human judgment.
+These boundaries are deliberate: V1.0 adds semantic intelligence without turning DA.OS into an opaque “ask a chatbot and hope” system.
