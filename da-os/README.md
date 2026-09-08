@@ -46,6 +46,7 @@ DA.OS is a lightweight personal operating system for an intensive data-analytics
 - Includes a persistent debug-notes area and reflection step
 - Stores solved vs needs-review debugging sessions locally
 - Builds a lightweight personal debugging memory so repeated errors become recognizable patterns
+- Includes a visible **New diagnosis** action to reset the active debugging session without clearing history
 
 #### Error Doctor coverage in V0.3
 
