@@ -17,6 +17,7 @@ const els = {
   errorText: $('errorText'),
   codeText: $('codeText'),
   diagnoseBtn: $('diagnoseBtn'),
+  newDiagnosisBtn: $('newDiagnosisBtn'),
   diagnosisTitle: $('diagnosisTitle'),
   diagnosisConfidence: $('diagnosisConfidence'),
   diagnosisEmpty: $('diagnosisEmpty'),
@@ -664,6 +665,7 @@ els.doctorTools.addEventListener('click', (e) => {
 });
 
 els.diagnoseBtn.addEventListener('click', startDiagnosis);
+if (els.newDiagnosisBtn) els.newDiagnosisBtn.addEventListener('click', newSession);
 els.nextTestBtn.addEventListener('click', revealNextTest);
 els.restartBtn.addEventListener('click', restartDiagnosis);
 els.revealFixBtn.addEventListener('click', revealFix);
@@ -685,8 +687,5 @@ document.querySelectorAll('[data-prompt]').forEach(btn => {
 document.querySelectorAll('[data-sample]').forEach(btn => {
   btn.addEventListener('click', () => loadSample(btn.dataset.sample));
 });
-
-// Double-clicking the diagnosis heading is a quick way to clear the current session without clearing history.
-els.diagnosisTitle.addEventListener('dblclick', newSession);
 
 hydrate();
