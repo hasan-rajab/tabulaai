@@ -1,0 +1,40 @@
+.next-memory-alert {
+  border: 1px solid #fedf89;
+  background: #fffaeb;
+  border-radius: 12px;
+  padding: 14px 16px;
+  margin: -10px 0 26px;
+}
+.next-memory-alert.has-blocker {
+  border-color: #fecdca;
+  background: #fef3f2;
+}
+.memory-alert-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+.memory-alert-head span {
+  color: #b54708;
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: .1em;
+}
+.next-memory-alert.has-blocker .memory-alert-head span { color: #b42318; }
+.memory-alert-head strong { font-size: 12px; }
+.memory-alert-rule {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 9px;
+  align-items: start;
+  padding: 8px 0;
+  border-top: 1px solid rgba(181,71,8,.12);
+}
+.next-memory-alert.has-blocker .memory-alert-rule { border-top-color: rgba(180,35,24,.12); }
+.memory-alert-rule b { font-size: 9px; letter-spacing: .05em; color: #b54708; padding-top: 3px; }
+.next-memory-alert.has-blocker .memory-alert-rule b { color: #b42318; }
+.memory-alert-rule p { margin: 0; color: #475467; font-size: 12px; line-height: 1.45; }
+.next-memory-alert > a { display: inline-block; margin-top: 8px; color: #111827; font-size: 12px; font-weight: 850; text-decoration: none; }
+.next-memory-alert > a:hover { text-decoration: underline; }
