@@ -59,3 +59,17 @@ jobs:
           grep -q '"ok": true' /tmp/daos-health.json
           grep -q '"aiConfigured": false' /tmp/daos-health.json
           curl -fsS http://127.0.0.1:8765/index.html | grep -q 'DA.OS'
+
+      - name: Package full V1.0 project
+        shell: bash
+        run: |
+          set -euo pipefail
+          zip -qr tabulaai-daos-v1.0.zip . -x '.git/*' 'tabulaai-daos-v1.0.zip'
+
+      - name: Upload full project ZIP
+        uses: actions/upload-artifact@v4
+        with:
+          name: tabulaai-daos-v1.0
+          path: tabulaai-daos-v1.0.zip
+          if-no-files-found: error
+          retention-days: 7
