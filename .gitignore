@@ -8,3 +8,4 @@ models/pretrained/*.joblib
 .forgeml/
 .falcon_state/
 .pytest_cache/
+catboost_info/
