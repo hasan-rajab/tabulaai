@@ -129,6 +129,8 @@ The Falcon bootstrap uses synthetic training data and marks that provenance expl
 
 ## Engineering principles demonstrated
 
+Read the system-wide invariants, failure modes, deterministic-control rationale, and scale path in **[docs/ENGINEERING_NOTES.md](docs/ENGINEERING_NOTES.md)**.
+
 1. **No label leakage:** online features are computed before the current transaction is persisted.
 2. **Reproducible lineage:** datasets, runs and model artifacts have explicit identities.
 3. **Safe releases:** challengers can be shadowed or traffic-split before promotion.
