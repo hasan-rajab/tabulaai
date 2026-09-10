@@ -5,6 +5,7 @@ from pathlib import Path
 from typing import Any
 
 from kafka import KafkaConsumer, KafkaProducer
+from kafka.structs import OffsetAndMetadata, TopicPartition
 
 from falcon.decision import FalconDecisionEngine
 from falcon.schema import TransactionEvent
@@ -13,9 +14,12 @@ from falcon.schema import TransactionEvent
 class KafkaDecisionWorker:
     """At-least-once Kafka worker for transaction -> decision streaming.
 
-    The input offset is committed only after the decision has been persisted and
-    the output event has been acknowledged by Kafka. Falcon decisions are
-    idempotent by transaction_id, so replay after a worker crash is safe.
+    The input record is committed only after the decision has been persisted and
+    the output event has been acknowledged by Kafka. The commit is scoped to the
+    exact source partition/offset instead of committing every assigned
+    partition's current position. Falcon decisions are idempotent by
+    transaction_id, so replay after a worker crash is safe in the single-process
+    reference runtime.
     """
 
     def __init__(
@@ -49,6 +53,18 @@ class KafkaDecisionWorker:
         event = TransactionEvent(**payload)
         return self.engine.decide(event).model_dump(mode="json")
 
+    def _commit_message(self, message) -> None:
+        """Commit only the successfully completed source record.
+
+        Kafka stores the *next* offset to read, hence ``message.offset + 1``.
+        Explicit partition-scoped commits avoid accidentally advancing another
+        assigned partition if the consumer has prefetched work there.
+        """
+        partition = TopicPartition(message.topic, message.partition)
+        self.consumer.commit(
+            offsets={partition: OffsetAndMetadata(message.offset + 1, None)}
+        )
+
     def run_forever(self) -> None:
         for message in self.consumer:
             decision = self.process_payload(message.value)
@@ -58,4 +74,4 @@ class KafkaDecisionWorker:
                 value=decision,
             )
             future.get(timeout=10)
-            self.consumer.commit()
+            self._commit_message(message)
