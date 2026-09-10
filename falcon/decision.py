@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import hashlib
+import threading
 from pathlib import Path
 from typing import Any
 
@@ -13,7 +14,14 @@ from forgeml.registry import ModelRegistry
 
 
 class FalconDecisionEngine:
-    """Point-in-time real-time risk engine with deterministic experimentation."""
+    """Point-in-time real-time risk engine with deterministic experimentation.
+
+    The portfolio implementation uses a process-local decision lock so the
+    idempotency check, point-in-time feature read, decision persistence and
+    feature-history write remain one ordered critical section. This is enough
+    for the single-process SQLite reference runtime. A distributed deployment
+    would move that invariant into a transactional external state store.
+    """
 
     def __init__(self, state_dir: str | Path):
         self.root = Path(state_dir)
@@ -22,6 +30,7 @@ class FalconDecisionEngine:
         self.features = OnlineFeatureStore(self.root / "falcon.db")
         self.store = DecisionStore(self.root / "falcon.db")
         self._bundle_cache: dict[str, Any] = {}
+        self._decision_lock = threading.Lock()
 
     @staticmethod
     def bucket(transaction_id: str) -> int:
@@ -67,68 +76,83 @@ class FalconDecisionEngine:
         return decision, reasons[:5]
 
     def decide(self, event: TransactionEvent) -> RiskDecision:
-        existing = self.store.get_decision(event.transaction_id)
-        if existing is not None:
-            return RiskDecision(
-                transaction_id=existing["transaction_id"],
-                decision=existing["decision"],
-                risk_score=existing["risk_score"],
-                supervised_score=existing["supervised_score"],
-                anomaly_score=existing["anomaly_score"],
-                model_version=existing["model_version"],
-                model_role=existing["model_role"],
-                champion_score=existing["champion_score"],
-                challenger_score=existing["challenger_score"],
-                experiment_bucket=existing["experiment_bucket"],
-                reasons=existing["reasons"],
-                created_at=existing["created_at"],
+        # Keep the entire point-in-time decision transition ordered in the
+        # local reference runtime. Without this, two concurrent requests for
+        # the same transaction could both pass the initial idempotency check
+        # and mutate feature history inconsistently.
+        with self._decision_lock:
+            existing = self.store.get_decision(event.transaction_id)
+            if existing is not None:
+                return RiskDecision(
+                    transaction_id=existing["transaction_id"],
+                    decision=existing["decision"],
+                    risk_score=existing["risk_score"],
+                    supervised_score=existing["supervised_score"],
+                    anomaly_score=existing["anomaly_score"],
+                    model_version=existing["model_version"],
+                    model_role=existing["model_role"],
+                    champion_score=existing["champion_score"],
+                    challenger_score=existing["challenger_score"],
+                    experiment_bucket=existing["experiment_bucket"],
+                    reasons=existing["reasons"],
+                    created_at=existing["created_at"],
+                )
+
+            feature_row = self.features.build(event)
+            champion_meta = self.registry.resolve("falcon-risk", "production")
+            champion = self._load_bundle(champion_meta["artifact_uri"])
+            champion_scores = champion.score(feature_row)
+
+            experiment = self.store.get_experiment()
+            bucket = self.bucket(event.transaction_id)
+            challenger_scores: dict[str, float] | None = None
+            challenger_meta: dict[str, Any] | None = None
+            assigned = (
+                experiment["challenger_version"] is not None
+                and int(experiment["traffic_percent"]) > 0
+                and bucket < int(experiment["traffic_percent"])
             )
+            if assigned:
+                challenger_meta = self.registry.get(
+                    "falcon-risk", int(experiment["challenger_version"])
+                )
+                challenger = self._load_bundle(challenger_meta["artifact_uri"])
+                challenger_scores = challenger.score(feature_row)
 
-        feature_row = self.features.build(event)
-        champion_meta = self.registry.resolve("falcon-risk", "production")
-        champion = self._load_bundle(champion_meta["artifact_uri"])
-        champion_scores = champion.score(feature_row)
+            use_challenger = bool(
+                assigned
+                and experiment["mode"] == "active"
+                and challenger_scores is not None
+            )
+            selected_scores = challenger_scores if use_challenger else champion_scores
+            selected_meta = challenger_meta if use_challenger else champion_meta
+            if selected_scores is None or selected_meta is None:
+                raise RuntimeError("No selected model available")
 
-        experiment = self.store.get_experiment()
-        bucket = self.bucket(event.transaction_id)
-        challenger_scores: dict[str, float] | None = None
-        challenger_meta: dict[str, Any] | None = None
-        assigned = (
-            experiment["challenger_version"] is not None
-            and int(experiment["traffic_percent"]) > 0
-            and bucket < int(experiment["traffic_percent"])
-        )
-        if assigned:
-            challenger_meta = self.registry.get("falcon-risk", int(experiment["challenger_version"]))
-            challenger = self._load_bundle(challenger_meta["artifact_uri"])
-            challenger_scores = challenger.score(feature_row)
-
-        use_challenger = bool(
-            assigned and experiment["mode"] == "active" and challenger_scores is not None
-        )
-        selected_scores = challenger_scores if use_challenger else champion_scores
-        selected_meta = challenger_meta if use_challenger else champion_meta
-        if selected_scores is None or selected_meta is None:
-            raise RuntimeError("No selected model available")
-
-        action, reasons = self._policy(float(selected_scores["risk_score"]), feature_row)
-        result = RiskDecision(
-            transaction_id=event.transaction_id,
-            decision=action,
-            risk_score=float(selected_scores["risk_score"]),
-            supervised_score=float(selected_scores["supervised_score"]),
-            anomaly_score=float(selected_scores["anomaly_score"]),
-            model_version=int(selected_meta["version"]),
-            model_role="challenger" if use_challenger else "champion",
-            champion_score=float(champion_scores["risk_score"]),
-            challenger_score=(
-                float(challenger_scores["risk_score"]) if challenger_scores is not None else None
-            ),
-            experiment_bucket=bucket if experiment["challenger_version"] is not None else None,
-            reasons=reasons,
-        )
-        self.store.save_decision(result, feature_row)
-        # Record only after scoring so the current transaction cannot influence
-        # its own point-in-time velocity or novelty features.
-        self.features.record(event)
-        return result
+            action, reasons = self._policy(
+                float(selected_scores["risk_score"]), feature_row
+            )
+            result = RiskDecision(
+                transaction_id=event.transaction_id,
+                decision=action,
+                risk_score=float(selected_scores["risk_score"]),
+                supervised_score=float(selected_scores["supervised_score"]),
+                anomaly_score=float(selected_scores["anomaly_score"]),
+                model_version=int(selected_meta["version"]),
+                model_role="challenger" if use_challenger else "champion",
+                champion_score=float(champion_scores["risk_score"]),
+                challenger_score=(
+                    float(challenger_scores["risk_score"])
+                    if challenger_scores is not None
+                    else None
+                ),
+                experiment_bucket=(
+                    bucket if experiment["challenger_version"] is not None else None
+                ),
+                reasons=reasons,
+            )
+            self.store.save_decision(result, feature_row)
+            # Record only after scoring so the current transaction cannot
+            # influence its own point-in-time velocity or novelty features.
+            self.features.record(event)
+            return result
