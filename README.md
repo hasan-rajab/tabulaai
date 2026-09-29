@@ -1,145 +1,159 @@
 # ForgeML + Falcon
 
-**Two production-style AI engineering systems: governed MLOps lifecycle management and real-time streaming decisioning.**
+**A production-style ML control plane and streaming decision system for moving models from experiments into governed operational decisions.**
 
-This repository contains two connected flagship projects built around one engineering question:
+This repository contains two connected systems:
 
-> **How do you take machine learning from offline experiments to controlled, observable production decisions?**
+- **ForgeML** — model lifecycle governance: data validation, lineage, registry, promotion, canary, drift, retraining and rollback.
+- **Falcon** — real-time transaction-risk decisioning: streaming features, supervised + anomaly scoring, champion/challenger experiments and delayed-label monitoring.
 
-- **ForgeML** manages the model lifecycle: validated data, experiment lineage, registry versions, deployment stages, canary releases, drift monitoring, retraining recommendations, and rollback.
-- **Falcon** is the production workload: a Kafka-driven transaction-risk decision system with point-in-time features, XGBoost + autoencoder scoring, champion/challenger experimentation, delayed-label monitoring, and governed model promotion.
+Together they answer one business/engineering question:
 
-The original TabulaAI experimentation application remains in the repository as the project lineage that preceded ForgeML.
+> **How do you turn an offline model into an observable, reversible and governable production decision process?**
 
-## Recruiter quick scan
+The original TabulaAI experimentation application remains in the repository as project lineage.
 
-| Project | Problem solved | Core engineering evidence |
-| --- | --- | --- |
-| **ForgeML** | Govern ML from dataset to production release | data contracts, SHA-256 lineage, experiment tracking, model registry, FastAPI serving, drift, canary, rollback, CI |
-| **Falcon** | Make low-latency risk decisions on streaming transaction events | Kafka, point-in-time features, XGBoost + autoencoder, champion/challenger, delayed feedback, Prometheus, Docker |
+> **Scope:** portfolio-grade production-style systems. Synthetic data is used for reproducible bootstrap/regression behavior; no real financial institution or live payment rail is connected.
 
-**Primary stack:** Python 3.12 · FastAPI · Kafka · XGBoost · scikit-learn · SQLite · Prometheus · Docker · GitHub Actions
+---
 
-## Architecture relationship
+## Executive view
+
+| Operating problem | System response |
+|---|---|
+| Experiments are hard to reproduce | dataset fingerprints, tracked runs and versioned model artifacts |
+| Model promotion is risky | explicit candidate → staging → production lifecycle |
+| New models need safe exposure | deterministic canary and champion/challenger modes |
+| Risk decisions need streaming context | Kafka + point-in-time transaction features |
+| Fraud labels arrive late | delayed-feedback monitoring and performance comparison |
+| Drift should not silently deploy a model | monitoring can recommend retraining; promotion remains explicit |
+| Rollback must be fast | prior production versions remain addressable and restorable |
+
+---
+
+## Business value
+
+The repository is designed around three enterprise concerns.
+
+### 1. Controlled model change
+Teams need evidence that a candidate is traceable, testable and reversible before it influences production decisions.
+
+### 2. Decision quality under asymmetric cost
+In fraud/risk scenarios, a false decline, missed fraud and manual-review decision have different business costs. Falcon therefore exposes a governed decision surface rather than reducing the problem to raw accuracy.
+
+### 3. Operational learning
+Real labels may arrive after a transaction has already been scored. The system preserves decision/experiment context so delayed outcomes can be used to compare champion and challenger behavior.
+
+A real deployment should optimize against business-cost and risk KPIs — loss prevented, false-positive burden, manual-review load, approval latency and customer friction — not only ROC-AUC.
+
+---
+
+## Architecture
 
 ```text
                  OFFLINE / RELEASE PLANE
 
 training data
-    |
-    v
-+---------------------------+
-| ForgeML                   |
-| validation + fingerprint  |
-| experiment tracking       |
-| model registry            |
-| candidate/staging/prod    |
-| canary + rollback         |
-+-------------+-------------+
-              |
-              | governed model version
-              v
+    ↓
+ForgeML
+  validation
+  dataset fingerprint
+  experiment tracking
+  model registry
+  candidate → staging → production
+  canary / rollback
+    ↓
+governed model version
+    ↓
 
                  ONLINE / DECISION PLANE
 
 Kafka transactions
-      |
-      v
-+---------------------------+
-| Falcon                    |
-| point-in-time features    |
-| XGBoost + autoencoder     |
-| champion/challenger       |
-| decision policy           |
-+-------------+-------------+
-              |
-              +--> approve
-              +--> step_up
-              +--> manual_review
-              |
-              v
-      decisions + feedback
-              |
-              +--> drift/performance monitoring
-              +--> candidate retraining in ForgeML
+    ↓
+point-in-time features
+    ↓
+XGBoost + autoencoder
+    ↓
+champion / challenger assignment
+    ↓
+decision policy
+  ├── approve
+  ├── step_up
+  └── manual_review
+    ↓
+persisted decision + experiment context
+    ↓
+delayed labels / drift / performance
+    ↓
+retraining candidate in ForgeML
 ```
 
-## ForgeML
+---
 
-ForgeML is a compact MLOps control plane implementing:
+## Verified engineering evidence
 
-- fail-fast training-data validation
-- SHA-256 dataset fingerprinting
-- durable SQLite experiment tracking
-- immutable versioned model artifacts
-- `candidate -> staging -> production -> archived` lifecycle
-- FastAPI prediction serving
-- deterministic canary routing
-- explicit promotion and rollback
-- numeric and categorical drift detection
-- performance/drift-based retraining recommendations
-- non-root Docker serving
-- CI regression gates
+Reference workflows on **10 September 2026**:
 
-Read the engineering case study: **[FORGEML.md](FORGEML.md)**
+### ForgeML CI run #105 — success
+The lifecycle-integrity job completed:
+- source compilation;
+- **5/5 lifecycle tests passed**;
+- model/API import checks;
+- separate non-root container build.
 
-## Falcon
+The tested lifecycle includes:
+- tracked/registered training candidates;
+- durable canary promotion and rollback;
+- drift-triggered retraining policy behavior.
 
-Falcon is a real-time transaction-risk decision system implementing:
+### Falcon CI run #102 — success
+The decisioning-integrity job completed:
+- Falcon + ForgeML compilation;
+- **7/7 end-to-end decisioning tests passed**;
+- clean champion/challenger bootstrap;
+- separate non-root container build.
 
-- Kafka input/output worker with manual offset commits
-- idempotent transaction replay
-- point-in-time velocity, novelty, amount-deviation and behavioral features
-- XGBoost supervised risk scoring
-- bottleneck autoencoder anomaly scoring
-- governed score fusion and `approve / step_up / manual_review` decisions
-- deterministic champion/challenger assignment
-- shadow and active experiment modes
-- delayed fraud-label feedback
-- Brier score / ROC-AUC comparison
-- PSI-style feature-drift monitoring
-- candidate retraining through ForgeML
-- explicit challenger promotion and rollback
-- FastAPI control plane, Prometheus metrics and browser dashboard
-- non-root Docker image + Kafka Compose stack
+The tests cover decisioning behavior including champion/challenger setup, delayed feedback and retraining paths.
 
-Read the engineering case study: **[FALCON.md](FALCON.md)**
+> Synthetic bootstrap data and CI regression behavior are not claims of real financial-fraud accuracy.
 
-## Verification evidence
+---
 
-The repository has separate GitHub Actions release gates for both systems.
+## Engineering controls that matter
 
-### ForgeML CI
+### Point-in-time feature safety
+Online features are computed before the current transaction is persisted, reducing label/future-information leakage risk.
 
-- source compilation
-- lifecycle regression tests
-- API import
-- non-root container build
+### Reproducible lineage
+Datasets, runs and model artifacts have explicit identities and fingerprints.
 
-### Falcon CI
+### Safe releases
+Candidates can be shadowed or traffic-split before production promotion.
 
-- Falcon + ForgeML source compilation
-- **7/7 end-to-end Falcon decisioning regression tests**
-- API + Kafka worker imports
-- clean champion/challenger bootstrap
-- non-root Falcon container build
-- Kafka Compose validation
+### Rollback is a deployment operation
+Reverting to a known model does not require retraining.
 
-The Falcon bootstrap uses synthetic training data and marks that provenance explicitly in registry metadata. Its metrics are demonstration/regression evidence, not claims of real financial-fraud accuracy.
+### Idempotent serving
+A replayed event returns the persisted decision rather than creating contradictory outcomes.
 
-## Engineering principles demonstrated
+### Monitoring is advisory, not autonomous deployment
+Drift/performance signals can create evidence and retraining candidates; promotion stays explicit.
 
-Read the system-wide invariants, failure modes, deterministic-control rationale, and scale path in **[docs/ENGINEERING_NOTES.md](docs/ENGINEERING_NOTES.md)**.
+---
 
-1. **No label leakage:** online features are computed before the current transaction is persisted.
-2. **Reproducible lineage:** datasets, runs and model artifacts have explicit identities.
-3. **Safe releases:** challengers can be shadowed or traffic-split before promotion.
-4. **Rollback is a deployment operation:** reverting does not require retraining.
-5. **Delayed outcomes matter:** production model quality is evaluated against later labels, not just training metrics.
-6. **Monitoring does not silently deploy:** drift/retraining creates evidence and candidates; promotion remains explicit.
-7. **Idempotency is part of ML serving:** event replay returns the persisted decision instead of creating conflicting outcomes.
+## Technology
 
-## Quick starts
+**ML:** XGBoost · scikit-learn · autoencoder anomaly scoring  
+**Streaming:** Kafka  
+**Serving/control:** FastAPI  
+**Lifecycle:** experiment tracking · model registry · canary · rollback  
+**Persistence:** SQLite local control-plane state  
+**Observability:** Prometheus  
+**Delivery:** Docker · Docker Compose · GitHub Actions
+
+---
+
+## Quick start
 
 ### ForgeML
 
@@ -161,37 +175,24 @@ python -m falcon.cli --state-dir .falcon bootstrap
 python -m falcon.cli --state-dir .falcon serve
 ```
 
-Kafka development stack:
+Kafka stack:
 
 ```bash
 docker compose -f docker-compose.falcon.yml up --build
 ```
 
-## Repository map
+---
 
-```text
-forgeml/                  # MLOps lifecycle platform
-falcon/                   # real-time decision engine
-FORGEML.md                # ForgeML engineering case study
-FALCON.md                  # Falcon engineering case study
-Dockerfile.forgeml
-Dockerfile.falcon
-docker-compose.falcon.yml
-requirements-forgeml.txt
-requirements-falcon.txt
-tests/
-.github/workflows/
+## Deeper case studies
 
-# Original TabulaAI experimentation layer
-app.py
-core/
-models/
-intelligence/
-ui/
-```
+- [ForgeML engineering case](FORGEML.md)
+- [Falcon engineering case](FALCON.md)
+- [System engineering notes](docs/ENGINEERING_NOTES.md)
 
-## Scope boundaries
+---
 
-These are portfolio-grade production-style systems, not claims of commercial deployment. Local SQLite/filesystem backends are used deliberately so lifecycle behavior remains reproducible on a laptop and in CI. A distributed production implementation would typically replace them with managed databases, object storage, distributed feature infrastructure and managed model-serving components.
+## What a real production implementation would add
 
-Falcon does **not** execute payment declines or move money. Its policy output is a decision recommendation surface intended to demonstrate real-time AI engineering and controlled model release patterns.
+A distributed deployment would typically replace local SQLite/filesystem state with managed databases/object storage, use production feature infrastructure, centralized observability, enterprise IAM/secrets and managed model-serving components.
+
+Falcon **does not execute payment declines or move money**. Its output is a governed decision recommendation surface used to demonstrate real-time ML engineering and controlled model release patterns.
